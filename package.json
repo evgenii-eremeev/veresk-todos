@@ -5,7 +5,6 @@
     "name": "veresk-notes",
     "type": "desktop",
     "gui": {
-      "backgroundColor": "#1F2430",
       "height": 540,
       "width": 720
     }
@@ -19,5 +18,8 @@
   "devDependencies": {
     "brittle": "^3.0.0",
     "pear-interface": "^1.0.0"
+  },
+  "dependencies": {
+    "uhtml": "^4.5.11"
   }
 }
