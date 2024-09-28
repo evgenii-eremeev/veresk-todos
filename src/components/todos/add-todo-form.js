@@ -1,7 +1,7 @@
 import { html, signal } from "uhtml/preactive";
 
-export function AddTodoForm(props, signals = { draftTodo }) {
-  const model = createAddTodoFormModel(props, signals);
+export function AddTodoForm(topModel, signals = { draftTodo }) {
+  const model = createAddTodoFormModel(topModel, signals);
 
   return html`<form onsubmit=${model.onSubmit}>
     <input
@@ -12,8 +12,8 @@ export function AddTodoForm(props, signals = { draftTodo }) {
   </form>`;
 }
 
-export function createAddTodoFormModel(props, signals = { draftTodo }) {
-  const { appendTodo } = props;
+export function createAddTodoFormModel(topModel, signals = { draftTodo }) {
+  const { appendTodo } = topModel;
   const { draftTodo } = signals;
 
   return {

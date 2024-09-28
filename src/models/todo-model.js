@@ -3,7 +3,7 @@ import { signalSetter } from "../utils/signal";
 
 const todos = signal([]);
 
-export function getAppModel(signals = { todos }) {
+export function createTodoModel(signals = { todos }) {
   const { todos } = signals;
   const setTodos = signalSetter(signals.todos);
 

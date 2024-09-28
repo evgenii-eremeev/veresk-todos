@@ -3,13 +3,13 @@ import { AddTodoForm } from "./components/todos/add-todo-form";
 import { TodoList } from "./components/todos/todo-list";
 import { TodoStats } from "./components/todo-stats/todo-stats";
 
-export const createApp = (model) => {
-  const { todos, appendTodo, todosStats } = model;
+export const createApp = (models) => {
+  const { todoModel } = models;
 
   return html`
     <!-- prettier-ignore -->
-    ${AddTodoForm({ appendTodo })}
-    ${TodoList({ todos })}
-    ${TodoStats({ todosStats })}
+    ${AddTodoForm(todoModel)}
+    ${TodoList(todoModel)}
+    ${TodoStats(todoModel)}
   `;
 };
