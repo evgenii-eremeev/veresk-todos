@@ -5,10 +5,12 @@ const todos = signal([]);
 
 export function getAppModel(signals = { todos }) {
   const { todos } = signals;
+  const setTodos = signalSetter(signals.todos);
 
   return {
     todos: todos.value,
-    setTodos: signalSetter(signals.todos),
+    setTodos,
+    appendTodo: (newTodo) => setTodos(prev => [...prev, newTodo]),
     todosStats: {
       count: todos.value.length
     }

@@ -4,11 +4,11 @@ import { TodoList } from "./components/todos/todo-list";
 import { TodoStats } from "./components/todo-stats/todo-stats";
 
 export const createApp = (model) => {
-  const { todos, setTodos, todosStats } = model;
+  const { todos, appendTodo, todosStats } = model;
 
   return html`
     <!-- prettier-ignore -->
-    ${AddTodoForm({ setTodos })}
+    ${AddTodoForm({ appendTodo })}
     ${TodoList({ todos })}
     ${TodoStats({ todosStats })}
   `;

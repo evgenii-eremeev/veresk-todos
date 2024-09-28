@@ -13,7 +13,7 @@ export function AddTodoForm(props, signals = { draftTodo }) {
 }
 
 export function createAddTodoFormModel(props, signals = { draftTodo }) {
-  const { setTodos } = props;
+  const { appendTodo } = props;
   const { draftTodo } = signals;
 
   return {
@@ -27,7 +27,7 @@ export function createAddTodoFormModel(props, signals = { draftTodo }) {
   };
 
   function addTodo() {
-    setTodos((prev) => [...prev, draftTodo.peek()]);
+    appendTodo(draftTodo.peek());
     draftTodo.value = "";
   }
 }
