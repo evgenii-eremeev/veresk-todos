@@ -1,43 +1,47 @@
-
 import { mockSignal } from "../../utils/testing";
-import { createTodoModel } from "../todo-model";
+import { getTodoModel } from "../todo-model";
 
 describe("App Model", () => {
   it("should init todos with empty array", () => {
     const todos = mockSignal([]);
-    const model = createTodoModel({ todos });
+    const model = getTodoModel({ todos });
     expect(model.todos).toEqual([]);
   });
 
   it("should set todos", () => {
     const todos = mockSignal(["task 1"]);
-    const modelBefore = createTodoModel({ todos });
+    const modelBefore = getTodoModel({ todos });
     modelBefore.setTodos((prev) => [...prev, "task 2"]);
-    const modelAfter = createTodoModel({ todos });
+    const modelAfter = getTodoModel({ todos });
     expect(modelAfter.todos).toEqual(["task 1", "task 2"]);
   });
 
   it("should append todos", () => {
     const todos = mockSignal(["task 1"]);
-    const modelBefore = createTodoModel({ todos });
-    modelBefore.appendTodo("task 2");
-    const modelAfter = createTodoModel({ todos });
-    expect(modelAfter.todos).toEqual(["task 1", "task 2"]);
+    getTodoModel({ todos }).appendTodo("task 2");
+    const model = getTodoModel({ todos });
+    expect(model.todos).toEqual(["task 1", "task 2"]);
+  });
+
+  it("should remove todo", () => {
+    const todos = mockSignal(["task 1", "task 2", "task 3"]);
+    getTodoModel({ todos }).removeTodo(0);
+    expect(getTodoModel({todos}).todos).toEqual(['task 2', 'task 3'])
   });
 
   describe("stats", () => {
     it("should init stats count", () => {
       const todos = mockSignal([]);
-      const model = createTodoModel({ todos });
+      const model = getTodoModel({ todos });
       expect(model.todosStats.count).toBe(0);
     });
     it("should update stats count", () => {
       const todos = mockSignal(["task 1"]);
-      const modelBefore = createTodoModel({ todos });
+      const modelBefore = getTodoModel({ todos });
       expect(modelBefore.todosStats.count).toBe(1);
-      modelBefore.setTodos(() => ['task 1', 'task 2'])
-      const modelAfter = createTodoModel({ todos });
-      expect(modelAfter.todosStats.count).toBe(2)
+      modelBefore.setTodos(() => ["task 1", "task 2"]);
+      const modelAfter = getTodoModel({ todos });
+      expect(modelAfter.todosStats.count).toBe(2);
     });
   });
 });

@@ -1,5 +1,5 @@
 import { TodoForm } from "../todo-form";
-import { createTodoModel } from "../../../models/todo-model";
+import { getTodoModel } from "../../../models/todo-model";
 import { mockEvent, mockSignal } from "../../../utils/testing";
 
 describe("Todo Form", () => {
@@ -57,7 +57,7 @@ describe("Todo Form", () => {
 function initTodoForm() {
   const draft = mockSignal("");
   const todos = mockSignal([]);
-  const todoModel = createTodoModel({ todos });
+  const todoModel = getTodoModel({ todos });
   const form = new TodoForm(todoModel, { draft });
   const model = form.model();
   return { form, model, todos };
