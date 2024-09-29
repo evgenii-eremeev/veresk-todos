@@ -23,10 +23,19 @@ describe("App Model", () => {
     expect(model.todos).toEqual(["task 1", "task 2"]);
   });
 
-  it("should remove todo", () => {
+  it("should remove a todo", () => {
     const todos = mockSignal(["task 1", "task 2", "task 3"]);
     getTodoModel({ todos }).removeTodo(0);
-    expect(getTodoModel({todos}).todos).toEqual(['task 2', 'task 3'])
+    expect(getTodoModel({ todos }).todos).toEqual(["task 2", "task 3"]);
+  });
+
+  it("should remove all todos", () => {
+    const todos = mockSignal(["task 1", "task 2", "task 3"]);
+    const model = getTodoModel({ todos });
+    model.removeTodo(0);
+    model.removeTodo(0);
+    model.removeTodo(0);
+    expect(getTodoModel({ todos }).todos).toEqual([]);
   });
 
   describe("stats", () => {

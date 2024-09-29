@@ -3,5 +3,10 @@ export function mockEvent(value) {
 }
 
 export function mockSignal(value) {
-  return { value, peek: () => value };
+  return {
+    value,
+    peek() {
+      return this.value;
+    },
+  };
 }
