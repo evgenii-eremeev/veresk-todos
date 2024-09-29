@@ -1,8 +1,8 @@
 {
-  "name": "veresk-notes",
+  "name": "veresk-todos",
   "main": "./src/index.html",
   "pear": {
-    "name": "veresk-notes",
+    "name": "veresk-todos",
     "type": "desktop",
     "gui": {
       "height": 540,
