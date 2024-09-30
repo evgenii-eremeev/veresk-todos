@@ -8,7 +8,7 @@ export const createApp = (models) => {
 
   return html`
     <!-- prettier-ignore -->
-    ${TodoForm.render(todoModel)}
+    ${TodoForm(todoModel)}
     ${TodoList(todoModel)}
     ${TodoStats(todoModel)}
   `;
