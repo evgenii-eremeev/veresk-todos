@@ -8,8 +8,18 @@ export function TodoForm(topModel, signals = { draft }) {
     signals
   );
   return html`<form onsubmit=${onSubmit}>
-    <input value=${inputValue} oninput=${onInput} />
-    <button type="submit" disabled=${buttonDisabled}>Add</button>
+    <input
+      class="border-2 border-blue-500"
+      value=${inputValue}
+      oninput=${onInput}
+    />
+    <button
+      class="border-2 border-blue-500 disabled:text-gray-300 disabled:border-gray-300"
+      type="submit"
+      disabled=${buttonDisabled}
+    >
+      Add
+    </button>
   </form>`;
 }
 

@@ -7,7 +7,7 @@ export function TodoList(topModel) {
     ${[
       ...todos.map(
         (name, index) =>
-          html`<li onclick=${() => onItemClick(index)}>${name}</li>`
+          html`<li class="border-solid border-2 border-blue-500" onclick=${() => onItemClick(index)}>${name}</li>`
       ),
     ]}
   </ol>`;
