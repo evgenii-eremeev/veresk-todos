@@ -12,9 +12,11 @@
   "type": "module",
   "license": "Apache-2.0",
   "scripts": {
-    "dev": "npm-run-all --parallel build:watch tailwind:watch pear-dev",
-    "build": "tsc",
-    "build:watch": "tsc --watch",
+    "dev": "npm-run-all --parallel tsc:watch tailwind:watch pear-dev",
+    "build": "npm-run-all --sequential clean tsc tailwind",
+    "clean": "rimraf dist",
+    "tsc": "tsc",
+    "tsc:watch": "npm run tsc -- --watch",
     "tailwind": "tailwindcss -i ./src/main.css -o ./dist/main.css",
     "tailwind:watch": "npm run tailwind -- --watch",
     "pear-dev": "pear run -d .",
@@ -31,6 +33,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "npm-run-all": "^4.1.5",
     "pear-interface": "^1.0.0",
+    "rimraf": "^6.0.1",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.6.2"
   },
