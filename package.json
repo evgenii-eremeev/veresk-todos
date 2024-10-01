@@ -13,6 +13,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "dev": "npm-run-all --parallel tsc:watch tailwind:watch pear-dev",
+    "dev:clean": "npm-run-all --sequential build dev",
     "build": "npm-run-all --sequential clean tsc tailwind",
     "clean": "rimraf dist",
     "tsc": "tsc",
