@@ -1,6 +1,6 @@
 {
   "name": "veresk-todos",
-  "main": "./src/index.html",
+  "main": "index.html",
   "pear": {
     "name": "veresk-todos",
     "type": "desktop",
@@ -12,24 +12,31 @@
   "type": "module",
   "license": "Apache-2.0",
   "scripts": {
-    "pear-dev": "pear run -d .",
-    "tailwind": "tailwindcss -i ./src/input.css -o ./src/output.css",
+    "dev": "npm-run-all --parallel build:watch tailwind:watch pear-dev",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "tailwind": "tailwindcss -i ./src/main.css -o ./dist/main.css",
     "tailwind:watch": "npm run tailwind -- --watch",
-    "dev": "npm-run-all --parallel tailwind:watch pear-dev",
+    "pear-dev": "pear run -d .",
     "test": "jest",
     "test:watch": "jest --watch"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.4",
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.0",
     "babel-jest": "^29.7.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "npm-run-all": "^4.1.5",
     "pear-interface": "^1.0.0",
-    "tailwindcss": "^3.4.13"
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.6.2"
   },
   "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "uhtml": "^4.5.11"
   }
 }
