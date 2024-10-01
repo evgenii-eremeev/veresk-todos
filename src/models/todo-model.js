@@ -16,5 +16,6 @@ export function getTodoModel(signals = { todos }) {
     todosStats: {
       count: todos.value.length,
     },
+    signals
   };
 }

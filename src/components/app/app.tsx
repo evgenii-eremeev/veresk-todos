@@ -1,10 +1,32 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
 
-type Props = {
-  foo: string;
-  bar: number;
+import { Signal } from "uhtml/preactive";
+import { TodoStats } from "../todo-stats/todo-stats";
+
+interface Props {
+  models: {
+    todoModel: {
+      signals: {
+        todos: Signal<Array<string>>;
+      }
+      todos: Array<string>;
+      todosStats: {
+        count: number;
+      };
+    };
+  };
 }
 
-export const App = (props: Props) => (
-  <div className="bg-slate-400">Hello world! The beggining is here!!</div>
-)
+export function App({ models: { todoModel } }: Props) {
+  const [statsCount, setStatsCount] = React.useState<number>(0);
+  React.useEffect(() => {
+    todoModel.signals.todos.subscribe(todos => {
+      setStatsCount(todos.length)
+    })
+  }, [])
+  return (
+    <div>
+      <TodoStats statsCount={statsCount} />
+    </div>
+  );
+}
