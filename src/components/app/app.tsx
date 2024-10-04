@@ -1,11 +1,11 @@
 import React from "react";
-import { Todos } from "../todo/Todos";
+import { Tasks } from "../tasks/Tasks";
 
 export function App() {
 
   return (
     <>
-      <Todos />
+      <Tasks />
     </>
   );
 }
