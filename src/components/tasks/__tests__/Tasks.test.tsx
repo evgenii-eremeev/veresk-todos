@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Tasks } from "../Tasks";
 import React from "react";
@@ -43,6 +43,17 @@ describe("Tasks", () => {
     expect(tasks.children).toHaveLength(2);
     expect(tasks.children[0].textContent).toContain("task 1");
     expect(tasks.children[1].textContent).toContain("task 2");
+  });
+
+  it("should add task on Enter", async () => {
+    render(<Tasks />);
+    const tasks = screen.getByRole("list");
+
+    screen.getByRole("textbox").focus()
+    await userEvent.keyboard('task A{Enter}');
+
+    expect(tasks.children).toHaveLength(1);
+    expect(tasks.children[0].textContent).toContain("task A");
   });
 
   it("should remove task on remove button click", async () => {
