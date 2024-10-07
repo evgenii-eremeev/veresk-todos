@@ -3,15 +3,16 @@ import { TaskListItem } from "./TaskListItem";
 import { useTasks } from "./TaskModel";
 
 export function TaskList() {
-  const { tasks, removeTask } = useTasks();
+  const { tasks, removeTask, toggleCompleted } = useTasks();
   return (
     <ul>
       {[
-        ...tasks.map(({ text }, index) => (
+        ...tasks.map((task, index) => (
           <TaskListItem
-            key={text + index}
-            text={text}
+            key={task.text + index}
+            task={task}
             onRemove={() => removeTask(index)}
+            toggleCompleted={() => toggleCompleted(index)}
           />
         )),
       ]}

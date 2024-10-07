@@ -27,6 +27,21 @@ describe("Tasks", () => {
     expect(input.value).toBe("");
   });
 
+  it("should have a checkbox", async () => {
+    render(<Tasks />);
+
+    await addTasks(["task 1", "task 2"]);
+
+    const [checkbox1] = screen.getAllByRole("checkbox");
+    const task1 = screen.getByText("task 1");
+    const task2 = screen.getByText("task 2");
+
+    expect(task1.classList.contains("line-through")).toBe(false);
+    await userEvent.click(checkbox1);
+    expect(task1.classList.contains("line-through")).toBe(true);
+    expect(task2.classList.contains("line-through")).toBe(false);
+  });
+
   it("should not create empty text task", async () => {
     render(<Tasks />);
     const tasks = screen.getByRole("list");
@@ -49,8 +64,8 @@ describe("Tasks", () => {
     render(<Tasks />);
     const tasks = screen.getByRole("list");
 
-    screen.getByRole("textbox").focus()
-    await userEvent.keyboard('task A{Enter}');
+    screen.getByRole("textbox").focus();
+    await userEvent.keyboard("task A{Enter}");
 
     expect(tasks.children).toHaveLength(1);
     expect(tasks.children[0].textContent).toContain("task A");

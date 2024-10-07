@@ -6,7 +6,7 @@ export function TaskCreator() {
   return (
     <form
       onSubmit={(event) => {
-        event.preventDefault()
+        event.preventDefault();
         addTask();
       }}
     >

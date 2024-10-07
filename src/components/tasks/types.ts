@@ -1,6 +1,7 @@
 
 export interface Task {
   text: string;
+  completed: boolean;
 }
 
 export interface TaskModel {
@@ -10,4 +11,5 @@ export interface TaskModel {
     setDraft: (draft: string) => void;
     addTask: () => void;
     removeTask: (index: number) => void;
+    toggleCompleted: (index: number) => void;
   }
