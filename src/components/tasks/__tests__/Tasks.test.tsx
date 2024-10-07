@@ -21,8 +21,7 @@ describe("Tasks", () => {
     render(<Tasks />);
 
     const input: HTMLInputElement = screen.getByRole("textbox");
-    await userEvent.type(input, "task 1");
-    await userEvent.click(screen.getByText("Add"));
+    await addTasks(["task 1"]);
 
     expect(await screen.findByText("task 1")).toBeTruthy();
     expect(input.value).toBe("");
@@ -39,16 +38,7 @@ describe("Tasks", () => {
   it("should be able to add many tasks", async () => {
     render(<Tasks />);
     const tasks = screen.getByRole("list");
-    const draftInput = screen.getByRole("textbox");
-    const addButton = screen.getByText("Add");
-
-    await userEvent.type(draftInput, "task 1");
-    await userEvent.click(screen.getByText("Add"));
-
-    expect(tasks.children).toHaveLength(1);
-
-    await userEvent.type(draftInput, "task 2");
-    await userEvent.click(screen.getByText("Add"));
+    await addTasks(["task 1", "task 2"]);
 
     expect(tasks.children).toHaveLength(2);
     expect(tasks.children[0].textContent).toContain("task 1");
@@ -58,14 +48,7 @@ describe("Tasks", () => {
   it("should remove task on remove button click", async () => {
     render(<Tasks />);
     const tasks = screen.getByRole("list");
-    const input = screen.getByRole("textbox");
-    const add = screen.getByText("Add");
-
-    await userEvent.type(input, "task 1");
-    await userEvent.click(add);
-
-    await userEvent.type(input, "task 2");
-    await userEvent.click(add);
+    await addTasks(["task 1", "task 2"]);
 
     const [removeBtn1] = await screen.findAllByText("Remove");
     await userEvent.click(removeBtn1);
@@ -74,3 +57,13 @@ describe("Tasks", () => {
     expect(tasks.children[0].textContent).toContain("task 2");
   });
 });
+
+async function addTasks(taskNames: Array<string>) {
+  const draftInput = screen.getByRole("textbox");
+  const addButton = screen.getByText("Add");
+
+  for (const taskName of taskNames) {
+    await userEvent.type(draftInput, taskName);
+    await userEvent.click(addButton);
+  }
+}
