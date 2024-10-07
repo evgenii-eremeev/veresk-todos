@@ -8,9 +8,9 @@ export function TaskListItem({
     onRemove: () => void;
   }) {
     return (
-      <li>
+      <li className="m-4">
         <span>{text}</span>
-        <button onClick={onRemove}>Remove</button>
+        <button className="mx-2 border-2 border-black rounded-md px-1 text-sm" onClick={onRemove}>Delete</button>
       </li>
     );
   }

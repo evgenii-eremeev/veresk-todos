@@ -1,9 +1,9 @@
-import React, { PropsWithChildren, useContext } from "react";
+import React, { createContext, PropsWithChildren, useContext, useState } from "react";
 import { Task, TaskModel } from "./types";
 
 
 export function useTasks() {
-  return React.useContext(TaskModelContext);
+  return useContext(TaskModelContext);
 }
 
 export function TaskModelProvider({ children }: PropsWithChildren) {
@@ -11,7 +11,7 @@ export function TaskModelProvider({ children }: PropsWithChildren) {
   return <TaskModelContext.Provider value={model} children={children} />;
 }
 
-const TaskModelContext = React.createContext<TaskModel>({
+const TaskModelContext = createContext<TaskModel>({
   tasks: [],
   setTasks: () => {},
   draft: "",
@@ -22,8 +22,8 @@ const TaskModelContext = React.createContext<TaskModel>({
 
 
 function useTaskModel(): TaskModel {
-  const [tasks, setTasks] = React.useState<Array<Task>>([]);
-  const [draft, setDraft] = React.useState("");
+  const [tasks, setTasks] = useState<Array<Task>>([]);
+  const [draft, setDraft] = useState("");
 
   return {
     tasks,

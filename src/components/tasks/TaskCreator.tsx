@@ -5,8 +5,17 @@ export function TaskCreator() {
   const { draft, setDraft, addTask } = useTasks();
   return (
     <div>
-      <input value={draft} onChange={(event) => setDraft(event.target.value)} />
-      <button onClick={addTask}>Add</button>
+      <input
+        className="border-2 border-blue-400 rounded-md mx-4 px-2 py-1"
+        value={draft}
+        onChange={(event) => setDraft(event.target.value)}
+      />
+      <button
+        className="border-2 border-blue-600 rounded-md px-2"
+        onClick={addTask}
+      >
+        Add
+      </button>
     </div>
   );
 }

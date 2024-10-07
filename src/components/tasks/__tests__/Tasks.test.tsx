@@ -50,7 +50,7 @@ describe("Tasks", () => {
     const tasks = screen.getByRole("list");
     await addTasks(["task 1", "task 2"]);
 
-    const [removeBtn1] = await screen.findAllByText("Remove");
+    const [removeBtn1] = await screen.findAllByText("Delete");
     await userEvent.click(removeBtn1);
 
     expect(tasks.children).toHaveLength(1);
