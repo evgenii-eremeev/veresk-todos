@@ -1,25 +1,20 @@
-import React from 'react';
+import React from "react";
 import { TaskListItem } from "./TaskListItem";
-import { Task } from "./types";
+import { useTasks } from "./TaskModel";
 
-export function TaskList({
-    tasks,
-    removeTask,
-  }: {
-    tasks: Task[];
-    removeTask: (index: number) => void;
-  }) {
-    return (
-      <ul>
-        {[
-          ...tasks.map(({ text }, index) => (
-            <TaskListItem
-              key={text + index}
-              text={text}
-              onRemove={() => removeTask(index)}
-            />
-          )),
-        ]}
-      </ul>
-    );
-  }
+export function TaskList() {
+  const { tasks, removeTask } = useTasks();
+  return (
+    <ul>
+      {[
+        ...tasks.map(({ text }, index) => (
+          <TaskListItem
+            key={text + index}
+            text={text}
+            onRemove={() => removeTask(index)}
+          />
+        )),
+      ]}
+    </ul>
+  );
+}
