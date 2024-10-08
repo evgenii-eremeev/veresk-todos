@@ -71,6 +71,18 @@ describe("Tasks", () => {
     expect(tasks.children[0].textContent).toContain("task A");
   });
 
+  it("should focus on input by clicking the label", async () => {
+    render(<Tasks />);
+    const tasks = screen.getByRole("list");
+
+    await userEvent.click(screen.getByText("Create new"));
+    await userEvent.keyboard("task{Enter}");
+
+    expect(tasks.children).toHaveLength(1);
+    expect(tasks.children[0].textContent).toContain("task");
+  });
+
+
   it("should remove task on remove button click", async () => {
     render(<Tasks />);
     const tasks = screen.getByRole("list");
