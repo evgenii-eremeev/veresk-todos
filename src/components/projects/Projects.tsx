@@ -7,9 +7,15 @@ import { ProjectTabs } from "./ProjectTabs";
 export function Projects() {
   return (
     <ProjectsModelProvider>
-      <ProjectCreator />
-      <ProjectTabs />
-      <Tasks />
+      <div className="grid grid-cols-12">
+        <div className="col-span-3">
+          <ProjectCreator />
+          <ProjectTabs />
+        </div>
+        <div className="col-span-9">
+          <Tasks />
+        </div>
+      </div>
     </ProjectsModelProvider>
   );
 }

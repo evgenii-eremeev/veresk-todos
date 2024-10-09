@@ -7,10 +7,16 @@ export function ProjectCreator() {
   const { addNewProject } = useProjects();
 
   return (
-    <>
-      <button onClick={() => setCreating(true)}>New project</button>
+    <div>
+      <button
+        className="border-2 border-yellow-500 rounded-md m-2 p-1"
+        onClick={() => setCreating(true)}
+      >
+        New project
+      </button>
       {creating && (
         <form
+          className="mx-2"
           role="form"
           onSubmit={(event) => {
             event.preventDefault();
@@ -19,9 +25,12 @@ export function ProjectCreator() {
             setNewProjectName("");
           }}
         >
-          <label htmlFor="project-name">Project name</label>
+          <label className="hidden" htmlFor="project-name">
+            Project name
+          </label>
           <input
             id="project-name"
+            className="p-1"
             autoFocus
             value={newProjectName}
             onChange={(event) => setNewProjectName(event.target.value)}
@@ -29,6 +38,6 @@ export function ProjectCreator() {
           <button type="submit">Create</button>
         </form>
       )}
-    </>
+    </div>
   );
 }

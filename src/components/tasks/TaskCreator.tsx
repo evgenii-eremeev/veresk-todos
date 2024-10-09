@@ -6,6 +6,7 @@ export function TaskCreator() {
   const { addTask, currentProject } = useProjects();
   return (
     <form
+      className="flex"
       onSubmit={(event) => {
         event.preventDefault();
         if (!draft || !currentProject) return;
@@ -13,16 +14,16 @@ export function TaskCreator() {
         setDraft("")
       }}
     >
-      <label htmlFor="create-task">Create new</label>
+      <label htmlFor="create-task" className="hidden">Create new</label>
       <input
         id="create-task"
-        className="border-2 border-blue-400 rounded-md mx-4 px-2 py-1"
+        className="flex-auto border-2 border-blue-400 rounded-md my-2 px-1"
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
       />
       <button
         type="submit"
-        className="border-2 border-blue-600 rounded-md px-2"
+        className="border-2 border-blue-600 rounded-md m-2 px-2"
       >
         Add
       </button>

@@ -12,16 +12,16 @@ export function TaskListItem({
   toggleCompleted: () => void;
 }) {
   return (
-    <li className="m-4">
+    <li className="flex items-center">
       <input
         className="mx-1"
         type="checkbox"
         checked={task.completed}
         onChange={toggleCompleted}
       />
-      <span className={clsx({ "line-through": task.completed })}>{task.text}</span>
+      <span className={clsx("flex-auto", { "line-through": task.completed })}>{task.text}</span>
       <button
-        className="mx-2 border-2 border-black rounded-md px-1 text-sm"
+        className="border-2 border-black rounded-md text-sm px-1 mx-2 my-1"
         onClick={onRemove}
       >
         Delete

@@ -10,8 +10,8 @@ export function Tasks() {
     currentProject && (
       <>
         <TasksTitle />
-        <TaskCreator />
         <TaskList />
+        <TaskCreator />
       </>
     )
   );
