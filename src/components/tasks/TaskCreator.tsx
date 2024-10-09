@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { useProjects } from "../../model/ProjectsModel";
 
 export function TaskCreator() {
-  const { draft, setDraft, addTask } = useProjects();
+  const [draft, setDraft] = useState("");
+  const { addTask } = useProjects();
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        addTask();
+        if (!draft) return;
+        addTask(draft);
+        setDraft("")
       }}
     >
       <label htmlFor="create-task">Create new</label>

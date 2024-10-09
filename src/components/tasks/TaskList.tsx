@@ -3,7 +3,7 @@ import { TaskListItem } from "./TaskListItem";
 import { useProjects } from "../../model/ProjectsModel";
 
 export function TaskList() {
-  const { tasks, removeTask, toggleCompleted } = useProjects();
+  const { tasks, removeTask, toggleTaskCompleted } = useProjects();
   return (
     <ul>
       {[
@@ -12,7 +12,7 @@ export function TaskList() {
             key={task.text + index}
             task={task}
             onRemove={() => removeTask(index)}
-            toggleCompleted={() => toggleCompleted(index)}
+            toggleCompleted={() => toggleTaskCompleted(index)}
           />
         )),
       ]}

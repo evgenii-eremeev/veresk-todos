@@ -5,8 +5,19 @@ import React, {
   useState,
 } from "react";
 import { Task } from "../types/task-types";
-import { ProjectsModel } from "../types/project-types";
 import { Project } from "../types/project-types";
+
+export interface ProjectsModel {
+  tasks: Array<Task>;
+  setTasks: (fn: (tasks: Array<Task>) => Array<Task>) => void;
+  addTask: (text: string) => void;
+  removeTask: (index: number) => void;
+  toggleTaskCompleted: (index: number) => void;
+  projects: Array<Project>;
+  selectedProject: Project | null;
+  addNewProject: (name: string) => void;
+  setSelectedProject: (project: Project) => void;
+}
 
 export function useProjects(): ProjectsModel {
   const model = useContext(ProjectsModelContext);
@@ -25,36 +36,31 @@ const ProjectsModelContext = createContext<ProjectsModel | null>(null);
 
 function useProjectsModel(): ProjectsModel {
   const [tasks, setTasks] = useState<Array<Task>>([]);
-  const [draft, setDraft] = useState("");
+
   const [projects, setProjects] = useState<Array<Project>>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   return {
     tasks,
     setTasks,
-    draft,
-    setDraft,
     addTask,
     removeTask,
-    toggleCompleted,
+    toggleTaskCompleted,
     projects,
     selectedProject,
     addNewProject,
     setSelectedProject,
   };
 
-  function addTask() {
-    if (!draft) return;
-
-    setTasks((tasks) => [...tasks, createNewTask(draft)]);
-    setDraft("");
+  function addTask(text: string) {
+    setTasks((tasks) => [...tasks, createNewTask(text)]);
   }
 
   function removeTask(index: number) {
     setTasks((tasks) => tasks.filter((_, i) => i != index));
   }
 
-  function toggleCompleted(index: number) {
+  function toggleTaskCompleted(index: number) {
     setTasks((tasks) =>
       tasks.map((task, idx) => {
         if (idx == index) {
