@@ -68,7 +68,7 @@ describe("Projects", () => {
     await userEvent.click(screen.getByText("New project"));
     await userEvent.keyboard("Candy{Enter}");
     expect(projects.children).toHaveLength(2);
-    expect(projects.children[0].textContent).toBe("Veresk");
-    expect(projects.children[1].textContent).toBe("Candy");
+    expect(projects.children[0].textContent).toBe("Candy");
+    expect(projects.children[1].textContent).toBe("Veresk");
   });
 });

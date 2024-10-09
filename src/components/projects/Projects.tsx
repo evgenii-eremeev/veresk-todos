@@ -43,7 +43,7 @@ export function Projects() {
   }
 
   function addProject(project: Project) {
-    setProjects((projects) => [...projects, project]);
+    setProjects((projects) => [project, ...projects]);
   }
 }
 
