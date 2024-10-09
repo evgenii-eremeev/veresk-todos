@@ -3,13 +3,13 @@ import { useProjects } from "../../model/ProjectsModel";
 
 export function TaskCreator() {
   const [draft, setDraft] = useState("");
-  const { addTask } = useProjects();
+  const { addTask, currentProject } = useProjects();
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        if (!draft) return;
-        addTask(draft);
+        if (!draft || !currentProject) return;
+        addTask(draft, currentProject.id);
         setDraft("")
       }}
     >

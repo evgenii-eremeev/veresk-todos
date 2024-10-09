@@ -2,6 +2,6 @@ import React from "react";
 import { useProjects } from "../../model/ProjectsModel";
 
 export function TasksTitle() {
-  const { selectedProject } = useProjects();
-  return <h2 className="text-center">{selectedProject?.name ?? 'Tasks'}</h2>;
+  const { currentProject } = useProjects();
+  return <h2 className="text-center">{currentProject?.name ?? 'Tasks'}</h2>;
 }

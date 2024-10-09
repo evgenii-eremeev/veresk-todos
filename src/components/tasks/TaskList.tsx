@@ -7,12 +7,12 @@ export function TaskList() {
   return (
     <ul>
       {[
-        ...tasks.map((task, index) => (
+        ...tasks.map((task) => (
           <TaskListItem
-            key={task.text + index}
+            key={task.id}
             task={task}
-            onRemove={() => removeTask(index)}
-            toggleCompleted={() => toggleTaskCompleted(index)}
+            onRemove={() => removeTask(task.id)}
+            toggleCompleted={() => toggleTaskCompleted(task.id)}
           />
         )),
       ]}

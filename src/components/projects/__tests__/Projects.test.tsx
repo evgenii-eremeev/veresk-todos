@@ -1,17 +1,8 @@
 import { render, screen, within } from "@testing-library/react";
 import React from "react";
 import userEvent from "@testing-library/user-event";
-import { Projects as NotWrappedProjects } from "../Projects";
-import { hasClass } from "../../../utils/testing";
-import { ProjectsModelProvider } from "../../../model/ProjectsModel";
-
-function Projects() {
-  return (
-    <ProjectsModelProvider>
-      <NotWrappedProjects />
-    </ProjectsModelProvider>
-  );
-}
+import { Projects } from "../Projects";
+import { addProjects, addTasks, hasClass } from "../../../utils/testing";
 
 describe("Projects", () => {
   it("should not create a project with empty name", async () => {
@@ -114,11 +105,51 @@ describe("Projects", () => {
     const heading = screen.getByRole("heading", { level: 2 });
     expect(heading.textContent).toBe("Veresk");
   });
+
+  it("should save tasks inside the project", async () => {
+    render(<Projects />);
+    await addProjects(["Veresk", "Candy"]);
+    await addTasks(["Candy task"]);
+
+    await userEvent.click(getProjectTab("Veresk"));
+    await addTasks(["Veresk task"]);
+
+    await userEvent.click(getProjectTab("Candy"));
+    expect(screen.queryByText("Candy task")).not.toBeNull();
+    expect(screen.queryByText("Veresk task")).toBeNull();
+
+    await userEvent.click(getProjectTab("Veresk"));
+    expect(screen.queryByText("Candy task")).toBeNull();
+    expect(screen.queryByText("Veresk task")).not.toBeNull();
+  });
+
+  it("should be able to complete task in one of the projects", async () => {
+    render(<Projects />);
+    await addProjects(["Veresk", "Candy"]);
+    await addTasks(["Candy task"]);
+
+    await userEvent.click(getProjectTab("Veresk"));
+    await addTasks(["Veresk task"]);
+
+    await userEvent.click(screen.getByText("Veresk task"));
+
+    expect(hasClass(screen.getByText("Veresk task"), "line-through"))
+  });
+
+  it("should be able to delete task in one of the projects", async () => {
+    render(<Projects />);
+    await addProjects(["Veresk", "Candy"]);
+    await addTasks(["Candy task"]);
+
+    await userEvent.click(getProjectTab("Veresk"));
+    await addTasks(["Veresk task"]);
+
+    await userEvent.click(screen.getByText("Delete"));
+
+    expect(screen.queryByText("Veresk task")).toBeNull();
+  });
 });
 
-async function addProjects(projectNames: Array<string>) {
-  for (const projectName of projectNames) {
-    await userEvent.click(screen.getByText("New project"));
-    await userEvent.keyboard(`${projectName}{Enter}`);
-  }
+function getProjectTab(name: string) {
+  return within(screen.getByRole("tablist")).getByText(name);
 }

@@ -1,15 +1,18 @@
 import React from "react";
 import { TaskList } from "./TaskList";
-import { ProjectsModelProvider } from "../../model/ProjectsModel";
+import { useProjects } from "../../model/ProjectsModel";
 import { TaskCreator } from "./TaskCreator";
 import { TasksTitle } from "./TasksTitle";
 
 export function Tasks() {
+  const { currentProject } = useProjects();
   return (
-    <>
-      <TasksTitle />
-      <TaskCreator />
-      <TaskList />
-    </>
+    currentProject && (
+      <>
+        <TasksTitle />
+        <TaskCreator />
+        <TaskList />
+      </>
+    )
   );
 }

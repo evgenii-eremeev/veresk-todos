@@ -1,33 +1,30 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Tasks as NotWrappedTasks } from "../Tasks";
 import React from "react";
-import { ProjectsModelProvider } from "../../../model/ProjectsModel";
+import { addProjects, addTasks } from "../../../utils/testing";
+import { Projects } from "../../projects/Projects";
 
-function Tasks() {
-  return (
-    <ProjectsModelProvider>
-      <NotWrappedTasks />
-    </ProjectsModelProvider>
-  );
+async function renderTasksAndSetup() {
+  render(<Projects />);
+  await addProjects(["Test project"]);
 }
 
 describe("Tasks", () => {
   it("should have a heading", async () => {
-    render(<Tasks />);
+    await renderTasksAndSetup();
 
     const heading = screen.getByRole("heading", { level: 2 });
-    expect(heading.textContent).toBe("Tasks");
+    expect(heading.textContent).toBe("Test project");
   });
 
   it("shuld render empty task list", async () => {
-    render(<Tasks />);
+    await renderTasksAndSetup();
     const tasks = screen.getByRole("list");
     expect(tasks.children).toHaveLength(0);
   });
 
   it("should have an input and add tasks with input's content", async () => {
-    render(<Tasks />);
+    await renderTasksAndSetup();
 
     const input: HTMLInputElement = screen.getByRole("textbox");
     await addTasks(["task 1"]);
@@ -37,7 +34,7 @@ describe("Tasks", () => {
   });
 
   it("should have a checkbox", async () => {
-    render(<Tasks />);
+    await renderTasksAndSetup();
 
     await addTasks(["task 1", "task 2"]);
 
@@ -52,7 +49,7 @@ describe("Tasks", () => {
   });
 
   it("should not create empty text task", async () => {
-    render(<Tasks />);
+    await renderTasksAndSetup();
     const tasks = screen.getByRole("list");
 
     await userEvent.click(screen.getByText("Add"));
@@ -60,7 +57,7 @@ describe("Tasks", () => {
   });
 
   it("should be able to add many tasks", async () => {
-    render(<Tasks />);
+    await renderTasksAndSetup();
     const tasks = screen.getByRole("list");
     await addTasks(["task 1", "task 2"]);
 
@@ -70,7 +67,7 @@ describe("Tasks", () => {
   });
 
   it("should add task on Enter", async () => {
-    render(<Tasks />);
+    await renderTasksAndSetup();
     const tasks = screen.getByRole("list");
 
     screen.getByRole("textbox").focus();
@@ -81,7 +78,7 @@ describe("Tasks", () => {
   });
 
   it("should focus on input by clicking the label", async () => {
-    render(<Tasks />);
+    await renderTasksAndSetup();
     const tasks = screen.getByRole("list");
 
     await userEvent.click(screen.getByText("Create new"));
@@ -92,7 +89,7 @@ describe("Tasks", () => {
   });
 
   it("should remove task on remove button click", async () => {
-    render(<Tasks />);
+    await renderTasksAndSetup();
     const tasks = screen.getByRole("list");
     await addTasks(["task 1", "task 2"]);
 
@@ -103,13 +100,3 @@ describe("Tasks", () => {
     expect(tasks.children[0].textContent).toContain("task 2");
   });
 });
-
-async function addTasks(taskNames: Array<string>) {
-  const draftInput = screen.getByRole("textbox");
-  const addButton = screen.getByText("Add");
-
-  for (const taskName of taskNames) {
-    await userEvent.type(draftInput, taskName);
-    await userEvent.click(addButton);
-  }
-}

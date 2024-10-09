@@ -5,8 +5,8 @@ import { ProjectsModelProvider } from "../../model/ProjectsModel";
 
 export function App() {
   return (
-    <ProjectsModelProvider>
+    <>
       <Projects />
-    </ProjectsModelProvider>
+    </>
   );
 }
