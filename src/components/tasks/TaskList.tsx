@@ -1,6 +1,6 @@
 import React from "react";
 import { TaskListItem } from "./TaskListItem";
-import { useTasks } from "./TaskModel";
+import { useTasks } from "../../model/TaskModel";
 
 export function TaskList() {
   const { tasks, removeTask, toggleCompleted } = useTasks();

@@ -1,3 +1,4 @@
+import { Project } from "./project-types";
 
 export interface Task {
   text: string;
@@ -12,4 +13,8 @@ export interface TaskModel {
     addTask: () => void;
     removeTask: (index: number) => void;
     toggleCompleted: (index: number) => void;
+    projects: Array<Project>;
+    selectedProject: Project | null;
+    addNewProject: (name: string) => void;
+    setSelectedProject: (project: Project) => void;
   }

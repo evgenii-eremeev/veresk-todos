@@ -1,5 +1,5 @@
 import React from "react";
-import { useTasks } from "./TaskModel";
+import { useTasks } from "../../model/TaskModel";
 
 export function TaskCreator() {
   const { draft, setDraft, addTask } = useTasks();

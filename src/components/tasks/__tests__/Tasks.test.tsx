@@ -1,7 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Tasks } from "../Tasks";
+import { Tasks as UnwrappedTasks } from "../Tasks";
 import React from "react";
+import { TaskModelProvider } from "../../../model/TaskModel";
+
+function Tasks() {
+  return (
+    <TaskModelProvider>
+      <UnwrappedTasks />
+    </TaskModelProvider>
+  );
+}
 
 describe("Tasks", () => {
   it("should have a heading", async () => {
@@ -81,7 +90,6 @@ describe("Tasks", () => {
     expect(tasks.children).toHaveLength(1);
     expect(tasks.children[0].textContent).toContain("task");
   });
-
 
   it("should remove task on remove button click", async () => {
     render(<Tasks />);

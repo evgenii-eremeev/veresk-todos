@@ -1,16 +1,12 @@
 import clsx from "clsx";
 import React, { useState } from "react";
 import { Tasks } from "../tasks/Tasks";
-
-interface Project {
-  name: string;
-}
+import { useTasks } from "../../model/TaskModel";
 
 export function Projects() {
   const [creating, setCreating] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
-  const [projects, setProjects] = useState<Array<Project>>([]);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const {projects, addNewProject, selectedProject, setSelectedProject} = useTasks();
 
   return (
     <div>
@@ -20,7 +16,9 @@ export function Projects() {
           role="form"
           onSubmit={(event) => {
             event.preventDefault();
-            addNewProject();
+            addNewProject(newProjectName);
+            setCreating(false);
+            setNewProjectName("");
           }}
         >
           <input
@@ -34,7 +32,9 @@ export function Projects() {
       <ul>
         {projects.map((project, index) => (
           <li
-            className={clsx({ "font-bold": project.name == selectedProject?.name })}
+            className={clsx({
+              "font-bold": project.name == selectedProject?.name,
+            })}
             onClick={() => setSelectedProject(project)}
             key={project.name + index}
           >
@@ -45,21 +45,5 @@ export function Projects() {
     </div>
   );
 
-  function addNewProject() {
-    setCreating(false);
-    const newProject = createProject(newProjectName)
-    addProject(newProject);
-    setNewProjectName("");
-    setSelectedProject(newProject)
-  }
 
-  function addProject(project: Project) {
-    setProjects((projects) => [project, ...projects]);
-  }
-}
-
-function createProject(name: string): Project {
-  return {
-    name,
-  };
 }

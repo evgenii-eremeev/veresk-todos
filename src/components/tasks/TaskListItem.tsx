@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React, { useState } from "react";
-import { Task } from "./types";
+import { Task } from "../../types/task-types";
 
 export function TaskListItem({
   task,
