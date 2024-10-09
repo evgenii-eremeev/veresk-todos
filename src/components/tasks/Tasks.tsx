@@ -1,6 +1,6 @@
 import React from "react";
 import { TaskList } from "./TaskList";
-import { TaskModelProvider } from "../../model/TaskModel";
+import { ProjectsModelProvider } from "../../model/ProjectsModel";
 import { TaskCreator } from "./TaskCreator";
 import { TasksTitle } from "./TasksTitle";
 

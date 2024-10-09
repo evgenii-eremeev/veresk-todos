@@ -1,8 +1,8 @@
 import React from "react";
-import { useTasks } from "../../model/TaskModel";
+import { useProjects } from "../../model/ProjectsModel";
 
 export function TaskCreator() {
-  const { draft, setDraft, addTask } = useTasks();
+  const { draft, setDraft, addTask } = useProjects();
   return (
     <form
       onSubmit={(event) => {

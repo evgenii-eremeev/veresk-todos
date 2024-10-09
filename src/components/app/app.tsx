@@ -1,13 +1,13 @@
 import React from "react";
 import { Tasks } from "../tasks/Tasks";
 import { Projects } from "../projects/Projects";
-import { TaskModelProvider } from "../../model/TaskModel";
+import { ProjectsModelProvider } from "../../model/ProjectsModel";
 
 export function App() {
   return (
-    <TaskModelProvider>
+    <ProjectsModelProvider>
       <Projects />
       <Tasks />
-    </TaskModelProvider>
+    </ProjectsModelProvider>
   );
 }

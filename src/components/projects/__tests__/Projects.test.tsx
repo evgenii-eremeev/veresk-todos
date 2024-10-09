@@ -3,13 +3,13 @@ import React from "react";
 import userEvent from "@testing-library/user-event";
 import { Projects as UnwrappedProjects } from "../Projects";
 import { hasClass } from "../../../utils/testing";
-import { TaskModelProvider } from "../../../model/TaskModel";
+import { ProjectsModelProvider } from "../../../model/ProjectsModel";
 
 function Projects() {
     return (
-      <TaskModelProvider>
+      <ProjectsModelProvider>
         <UnwrappedProjects />
-      </TaskModelProvider>
+      </ProjectsModelProvider>
     );
   }
 

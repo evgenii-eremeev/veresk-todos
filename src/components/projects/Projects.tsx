@@ -1,12 +1,12 @@
 import clsx from "clsx";
 import React, { useState } from "react";
 import { Tasks } from "../tasks/Tasks";
-import { useTasks } from "../../model/TaskModel";
+import { useProjects } from "../../model/ProjectsModel";
 
 export function Projects() {
   const [creating, setCreating] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
-  const {projects, addNewProject, selectedProject, setSelectedProject} = useTasks();
+  const {projects, addNewProject, selectedProject, setSelectedProject} = useProjects();
 
   return (
     <div>

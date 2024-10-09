@@ -4,33 +4,26 @@ import React, {
   useContext,
   useState,
 } from "react";
-import { Task, TaskModel } from "../types/task-types";
+import { Task } from "../types/task-types";
+import { ProjectsModel } from "../types/project-types";
 import { Project } from "../types/project-types";
 
-export function useTasks() {
-  return useContext(TaskModelContext);
+export function useProjects(): ProjectsModel {
+  const model = useContext(ProjectsModelContext);
+  if (!model) {
+		throw new Error('useProjects must be used within a ProjectsModelProvider')
+	}
+  else return model;
 }
 
-export function TaskModelProvider({ children }: PropsWithChildren) {
-  const model = useTaskModel();
-  return <TaskModelContext.Provider value={model} children={children} />;
+export function ProjectsModelProvider({ children }: PropsWithChildren) {
+  const model = useProjectsModel();
+  return <ProjectsModelContext.Provider value={model} children={children} />;
 }
 
-const TaskModelContext = createContext<TaskModel>({
-  tasks: [],
-  setTasks: () => {},
-  draft: "",
-  setDraft: () => {},
-  addTask: () => {},
-  removeTask: () => {},
-  toggleCompleted: () => {},
-  projects: [],
-  addNewProject: () => {},
-  selectedProject: null,
-  setSelectedProject: () => {},
-});
+const ProjectsModelContext = createContext<ProjectsModel | null>(null);
 
-function useTaskModel(): TaskModel {
+function useProjectsModel(): ProjectsModel {
   const [tasks, setTasks] = useState<Array<Task>>([]);
   const [draft, setDraft] = useState("");
   const [projects, setProjects] = useState<Array<Project>>([]);
@@ -47,7 +40,7 @@ function useTaskModel(): TaskModel {
     projects,
     selectedProject,
     addNewProject,
-    setSelectedProject
+    setSelectedProject,
   };
 
   function addTask() {
@@ -90,7 +83,6 @@ function useTaskModel(): TaskModel {
 function createNewTask(text: string): Task {
   return { text, completed: false };
 }
-
 
 function createNewProject(name: string): Project {
   return {

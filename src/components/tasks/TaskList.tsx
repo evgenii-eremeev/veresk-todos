@@ -1,9 +1,9 @@
 import React from "react";
 import { TaskListItem } from "./TaskListItem";
-import { useTasks } from "../../model/TaskModel";
+import { useProjects } from "../../model/ProjectsModel";
 
 export function TaskList() {
-  const { tasks, removeTask, toggleCompleted } = useTasks();
+  const { tasks, removeTask, toggleCompleted } = useProjects();
   return (
     <ul>
       {[
