@@ -1,5 +1,7 @@
 import React from "react";
+import { useProjects } from "../../model/ProjectsModel";
 
 export function TasksTitle() {
-  return <h2 className="text-center">Tasks</h2>;
+  const { selectedProject } = useProjects();
+  return <h2 className="text-center">{selectedProject?.name ?? 'Tasks'}</h2>;
 }

@@ -6,7 +6,8 @@ import { useProjects } from "../../model/ProjectsModel";
 export function Projects() {
   const [creating, setCreating] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
-  const {projects, addNewProject, selectedProject, setSelectedProject} = useProjects();
+  const { projects, addNewProject, selectedProject, setSelectedProject } =
+    useProjects();
 
   return (
     <div>
@@ -21,7 +22,9 @@ export function Projects() {
             setNewProjectName("");
           }}
         >
+          <label htmlFor="project-name">Project name</label>
           <input
+            id="project-name"
             autoFocus
             value={newProjectName}
             onChange={(event) => setNewProjectName(event.target.value)}
@@ -29,7 +32,7 @@ export function Projects() {
           <button type="submit">Create</button>
         </form>
       )}
-      <ul>
+      <ul role="tablist">
         {projects.map((project, index) => (
           <li
             className={clsx({
@@ -42,8 +45,7 @@ export function Projects() {
           </li>
         ))}
       </ul>
+      {selectedProject && <Tasks />}
     </div>
   );
-
-
 }

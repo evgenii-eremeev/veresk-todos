@@ -1,13 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Tasks as UnwrappedTasks } from "../Tasks";
+import { Tasks as NotWrappedTasks } from "../Tasks";
 import React from "react";
 import { ProjectsModelProvider } from "../../../model/ProjectsModel";
 
 function Tasks() {
   return (
     <ProjectsModelProvider>
-      <UnwrappedTasks />
+      <NotWrappedTasks />
     </ProjectsModelProvider>
   );
 }
