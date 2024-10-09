@@ -87,6 +87,16 @@ describe("Projects", () => {
     expect(hasClass(screen.getByText("Candy"), "font-bold")).toBe(false);
   });
 
+  it("should not rely on project name as uniq identificator", async () => {
+    render(<Projects />);
+    await addProjects(["Metoo", "Metoo"]);
+
+    const [first, second] = screen.getAllByText("Metoo")
+    await userEvent.click(second);
+    expect(hasClass(first, "font-bold")).toBe(false);
+    expect(hasClass(second, "font-bold")).toBe(true);
+  });
+
   xit('should display tasks after project is created', async () => {
     render(<Projects />);
     await addProjects(["Veresk"]);

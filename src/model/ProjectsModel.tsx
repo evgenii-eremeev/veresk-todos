@@ -6,6 +6,7 @@ import React, {
 } from "react";
 import { Task } from "../types/task-types";
 import { Project } from "../types/project-types";
+import { randomStringOfNumbers } from "../utils/random";
 
 export interface ProjectsModel {
   tasks: Array<Task>;
@@ -87,11 +88,12 @@ function useProjectsModel(): ProjectsModel {
 }
 
 function createNewTask(text: string): Task {
-  return { text, completed: false };
+  return { text, completed: false, id: randomStringOfNumbers() };
 }
 
 function createNewProject(name: string): Project {
   return {
     name,
+    id: randomStringOfNumbers()
   };
 }
