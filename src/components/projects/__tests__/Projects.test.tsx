@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import React from "react";
 import userEvent from "@testing-library/user-event";
 import { Projects } from "../Projects";
+import { hasClass } from "../../../utils/testing";
 
 describe("Projects", () => {
   it("should not create a project with empty name", async () => {
@@ -42,8 +43,7 @@ describe("Projects", () => {
     render(<Projects />);
     const projects = screen.getByRole("list");
 
-    await userEvent.click(screen.getByText("New project"));
-    await userEvent.keyboard("Veresk{Enter}");
+    await addProjects(["Veresk"]);
     expect(projects.children).toHaveLength(1);
     expect(projects.children[0].textContent).toBe("Veresk");
   });
@@ -63,12 +63,33 @@ describe("Projects", () => {
     render(<Projects />);
     const projects = screen.getByRole("list");
 
-    await userEvent.click(screen.getByText("New project"));
-    await userEvent.keyboard("Veresk{Enter}");
-    await userEvent.click(screen.getByText("New project"));
-    await userEvent.keyboard("Candy{Enter}");
+    await addProjects(["Veresk", "Candy"]);
     expect(projects.children).toHaveLength(2);
     expect(projects.children[0].textContent).toBe("Candy");
     expect(projects.children[1].textContent).toBe("Veresk");
   });
+
+  it("should select project by clicking", async () => {
+    render(<Projects />);
+    await addProjects(["Veresk", "Candy"]);
+    expect(hasClass(screen.getByText("Candy"), "font-bold")).toBe(true);
+    await userEvent.click(screen.getByText("Veresk"));
+    expect(hasClass(screen.getByText("Veresk"), "font-bold")).toBe(true);
+    expect(hasClass(screen.getByText("Candy"), "font-bold")).toBe(false);
+  });
+
+  it('should display tasks after project is created', async () => {
+    render(<Projects />);
+    await addProjects(["Veresk"]);
+    const heading = screen.getByRole("heading", { level: 2 });
+    expect(heading.textContent).toBe("Tasks");
+  })
 });
+
+async function addProjects(projectNames: Array<string>) {
+  for (const projectName of projectNames) {
+    await userEvent.click(screen.getByText("New project"));
+    await userEvent.keyboard(`${projectName}{Enter}`);
+  }
+}
+

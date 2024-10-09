@@ -1,4 +1,6 @@
+import clsx from "clsx";
 import React, { useState } from "react";
+import { Tasks } from "../tasks/Tasks";
 
 interface Project {
   name: string;
@@ -8,6 +10,7 @@ export function Projects() {
   const [creating, setCreating] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
   const [projects, setProjects] = useState<Array<Project>>([]);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   return (
     <div>
@@ -30,7 +33,13 @@ export function Projects() {
       )}
       <ul>
         {projects.map((project, index) => (
-          <li key={project.name + index}>{project.name}</li>
+          <li
+            className={clsx({ "font-bold": project.name == selectedProject?.name })}
+            onClick={() => setSelectedProject(project)}
+            key={project.name + index}
+          >
+            {project.name}
+          </li>
         ))}
       </ul>
     </div>
@@ -38,8 +47,10 @@ export function Projects() {
 
   function addNewProject() {
     setCreating(false);
-    addProject(createProject(newProjectName));
+    const newProject = createProject(newProjectName)
+    addProject(newProject);
     setNewProjectName("");
+    setSelectedProject(newProject)
   }
 
   function addProject(project: Project) {
