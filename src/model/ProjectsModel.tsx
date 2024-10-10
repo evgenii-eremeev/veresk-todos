@@ -11,6 +11,7 @@ import { randomStringOfNumbers } from "../utils/random";
 export interface ProjectsModel {
   tasks: Array<Task>;
   addTask: (projectId: string, text: string) => void;
+  editTask: (taskId: string, text: string) => void;
   removeTask: (taskId: string) => void;
   toggleTaskCompleted: (taskId: string) => void;
   projects: Array<Project>;
@@ -42,6 +43,7 @@ function useProjectsModel(): ProjectsModel {
   return {
     tasks: tasks.filter((task) => task.projectId == currentProject?.id),
     addTask,
+    editTask,
     removeTask,
     toggleTaskCompleted,
     projects,
@@ -52,6 +54,10 @@ function useProjectsModel(): ProjectsModel {
 
   function addTask(projectId: string, text: string) {
     setTasks((tasks) => [...tasks, createNewTask(text, projectId)]);
+  }
+
+  function editTask(taskId: string, text: string) {
+    updateTask(taskId, () => ({ text }));
   }
 
   function removeTask(taskId: string) {

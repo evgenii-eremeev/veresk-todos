@@ -1,32 +1,51 @@
 import React, { useState } from "react";
 import { useProjects } from "../../model/ProjectsModel";
+import { Task } from "../../types/task-types";
+import { Button } from "../common/Button";
 
-export function TaskCreator() {
-  const [draft, setDraft] = useState("");
-  const { addTask, currentProject } = useProjects();
+interface Props {
+  onDone?: () => void;
+  task?: Task;
+}
+export function TaskCreator({
+  onDone = () => {},
+  task,
+}: Props = {}) {
+  const [draft, setDraft] = useState(task ? task.text : "");
+  const { addTask, editTask, currentProject } = useProjects();
+  const editMode = task != null;
+
   return (
     <form
-      className="flex"
+      className="flex flex-auto"
       onSubmit={(event) => {
         event.preventDefault();
         if (!draft || !currentProject) return;
-        addTask(currentProject.id, draft);
-        setDraft("")
+        if (editMode) {
+          editTask(task.id, draft)
+        } else {
+          addTask(currentProject.id, draft);
+        }
+        setDraft("");
+        onDone();
       }}
     >
-      <label htmlFor="create-task" className="hidden">Create new</label>
+      <label htmlFor="task-text" className="hidden">
+        {editMode ? "Edit task" : "Create new"}
+      </label>
       <input
-        id="create-task"
+        autoFocus={editMode}
+        id="task-text"
         className="flex-auto border-2 border-blue-400 rounded-md my-2 px-1"
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
       />
-      <button
+      <Button
         type="submit"
-        className="border-2 border-blue-600 rounded-md m-2 px-2"
+        className="mx-2"
       >
-        Add
-      </button>
+        {editMode ? "Done" : "Add"}
+      </Button>
     </form>
   );
 }

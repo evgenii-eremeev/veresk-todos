@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { addProjects, addTasks } from "../../../utils/testing";
@@ -98,5 +98,55 @@ describe("Tasks", () => {
 
     expect(tasks.children).toHaveLength(1);
     expect(tasks.children[0].textContent).toContain("task 2");
+  });
+
+  describe("editing", () => {
+    it("should show input with done button after clicking edit", async () => {
+      await renderTasksAndSetup();
+      const tasks = screen.getByRole("list");
+      await addTasks(["task 1"]);
+
+      await userEvent.click(screen.getByText("Edit"));
+      expect(within(tasks).queryByLabelText("Edit task")).not.toBeNull();
+      expect(within(tasks).queryByText("Done")).not.toBeNull();
+    });
+
+    it("should hide checkbox, text and delete button in edit mode", async () => {
+      await renderTasksAndSetup();
+      const tasks = screen.getByRole("list");
+      await addTasks(["task 1"]);
+
+      await userEvent.click(screen.getByText("Edit"));
+
+      expect(within(tasks).queryByRole("checkbox")).toBeNull();
+      expect(within(tasks).queryByText("task 1")).toBeNull();
+      expect(within(tasks).queryByText("Edit")).toBeNull();
+      expect(within(tasks).queryByText("Delete")).toBeNull();
+    });
+
+    it("should show task in read mode after clicking done", async () => {
+      await renderTasksAndSetup();
+      await addTasks(["task 1"]);
+      const tasks = screen.getByRole("list");
+
+      await userEvent.click(screen.getByText("Edit"));
+      await userEvent.click(screen.getByText("Done"));
+
+      expect(tasks.children.length).toBe(1)
+      expect(within(tasks).getByRole("checkbox")).not.toBeNull();
+      expect(within(tasks).getByText("task 1")).not.toBeNull();
+      expect(within(tasks).getByText("Edit")).not.toBeNull();
+      expect(within(tasks).getByText("Delete")).not.toBeNull();
+    });
+
+    it('should edit task text', async () => {
+      await renderTasksAndSetup();
+      await addTasks(["task 1"]);
+
+      await userEvent.click(screen.getByText("Edit"));
+      await userEvent.keyboard(' updated{Enter}')
+
+      expect(screen.getByText("task 1 updated")).not.toBeNull();
+    })
   });
 });

@@ -148,6 +148,7 @@ describe("Projects", () => {
 
     expect(screen.queryByText("Veresk task")).toBeNull();
   });
+
 });
 
 function getProjectTab(name: string) {

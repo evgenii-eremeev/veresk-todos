@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useProjects } from "../../model/ProjectsModel";
+import { Button } from "../common/Button";
 
 export function ProjectCreator() {
   const [creating, setCreating] = useState(false);
@@ -8,12 +9,12 @@ export function ProjectCreator() {
 
   return (
     <div>
-      <button
-        className="border-2 border-yellow-500 rounded-md m-2 p-1"
+      <Button
+        className=" border-yellow-500 m-2"
         onClick={() => setCreating(true)}
       >
         New project
-      </button>
+      </Button>
       {creating && (
         <form
           className="mx-2"
@@ -35,7 +36,7 @@ export function ProjectCreator() {
             value={newProjectName}
             onChange={(event) => setNewProjectName(event.target.value)}
           />
-          <button type="submit">Create</button>
+          <Button type="submit">Create</Button>
         </form>
       )}
     </div>
