@@ -10,7 +10,7 @@ export function TaskCreator() {
       onSubmit={(event) => {
         event.preventDefault();
         if (!draft || !currentProject) return;
-        addTask(draft, currentProject.id);
+        addTask(currentProject.id, draft);
         setDraft("")
       }}
     >
