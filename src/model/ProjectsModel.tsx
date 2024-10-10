@@ -59,12 +59,19 @@ function useProjectsModel(): ProjectsModel {
   }
 
   function toggleTaskCompleted(taskId: string) {
+    updateTask(taskId, (task) => ({ completed: !task.completed }));
+  }
+
+  function updateTask(
+    taskId: string,
+    updater: (task: Task) => Partial<Omit<Task, "id" | "projectId">>
+  ) {
     setTasks((tasks) =>
       tasks.map((task) => {
         if (task.id == taskId) {
           return {
             ...task,
-            completed: !task.completed,
+            ...updater(task),
           };
         } else {
           return task;
