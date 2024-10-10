@@ -149,6 +149,13 @@ describe("Projects", () => {
     expect(screen.queryByText("Veresk task")).toBeNull();
   });
 
+  it('should be able to delete the project', async () => {
+    render(<Projects />);
+    await addProjects(["Veresk"]);
+    await userEvent.click(screen.getByText("Delete project"));
+    expect(screen.queryAllByText("Veresk")).toHaveLength(0)
+  })
+
 });
 
 function getProjectTab(name: string) {

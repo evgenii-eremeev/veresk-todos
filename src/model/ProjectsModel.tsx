@@ -17,7 +17,8 @@ export interface ProjectsModel {
   projects: Array<Project>;
   currentProject: Project | null;
   addNewProject: (name: string) => void;
-  setCurrentProject: (project: Project) => void;
+  setCurrentProject: (project: Project | null) => void;
+  removeProject: (projectId: string) => void;
 }
 
 export function useProjects(): ProjectsModel {
@@ -50,6 +51,7 @@ function useProjectsModel(): ProjectsModel {
     currentProject,
     addNewProject,
     setCurrentProject,
+    removeProject
   };
 
   function addTask(projectId: string, text: string) {
@@ -94,6 +96,12 @@ function useProjectsModel(): ProjectsModel {
 
   function addProject(project: Project) {
     setProjects((projects) => [project, ...projects]);
+  }
+
+  function removeProject(projectId: string) {
+    setProjects((projects) =>
+      projects.filter((project) => project.id != projectId)
+    );
   }
 }
 
