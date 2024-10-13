@@ -2,11 +2,13 @@ import React, {
   createContext,
   PropsWithChildren,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import { Task } from "../types/task-types";
 import { Project } from "../types/project-types";
 import { randomStringOfNumbers } from "../utils/random";
+import { Persist } from "../types/persist-types";
 
 export interface ProjectsModel {
   tasks: Array<Task>;
@@ -28,18 +30,23 @@ export function useProjects(): ProjectsModel {
   } else return model;
 }
 
-export function ProjectsModelProvider({ children }: PropsWithChildren) {
-  const model = useProjectsModel();
+export function ProjectsModelProvider({
+  children,
+  persist,
+}: PropsWithChildren<{ persist: Persist }>) {
+  const model = useProjectsModel({ persist });
   return <ProjectsModelContext.Provider value={model} children={children} />;
 }
 
 const ProjectsModelContext = createContext<ProjectsModel | null>(null);
 
-function useProjectsModel(): ProjectsModel {
+function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
   const [tasks, setTasks] = useState<Array<Task>>([]);
 
   const [projects, setProjects] = useState<Array<Project>>([]);
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
+
+  usePersistance({ persist, setProjects, projects, tasks, setTasks });
 
   return {
     tasks: tasks.filter((task) => task.projectId == currentProject?.id),
@@ -51,7 +58,7 @@ function useProjectsModel(): ProjectsModel {
     currentProject,
     addNewProject,
     setCurrentProject,
-    removeProject
+    removeProject,
   };
 
   function addTask(projectId: string, text: string) {
@@ -105,11 +112,44 @@ function useProjectsModel(): ProjectsModel {
   }
 }
 
-function createNewTask(text: string, projectId: string): Task {
+function usePersistance({
+  persist,
+  setProjects,
+  setTasks,
+  projects,
+  tasks
+}: {
+  persist: Persist;
+  setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  projects: Project[];
+  tasks: Task[];
+}) {
+  useEffect(() => {
+    const projectsString = persist.get("projects");
+    if (projectsString) {
+      setProjects(JSON.parse(projectsString));
+    }
+    const tasksString = persist.get("tasks");
+    if (tasksString) {
+      setTasks(JSON.parse(tasksString));
+    }
+  }, []);
+
+  useEffect(() => {
+    persist.set("projects", JSON.stringify(projects));
+  }, [projects]);
+
+  useEffect(() => {
+    persist.set("tasks", JSON.stringify(tasks));
+  }, [tasks]);
+}
+
+export function createNewTask(text: string, projectId: string): Task {
   return { text, completed: false, id: randomStringOfNumbers(), projectId };
 }
 
-function createNewProject(name: string): Project {
+export function createNewProject(name: string): Project {
   return {
     name,
     id: randomStringOfNumbers(),

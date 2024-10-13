@@ -1,12 +1,13 @@
 import React from "react";
-import { Tasks } from "../tasks/Tasks";
 import { Projects } from "../projects/Projects";
-import { ProjectsModelProvider } from "../../model/ProjectsModel";
+import { Persist } from "../../utils/persist";
+
+const persist = new Persist();
 
 export function App() {
   return (
     <>
-      <Projects />
+      <Projects persist={persist} />
     </>
   );
 }

@@ -1,11 +1,12 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
-import { addProjects, addTasks } from "../../../utils/testing";
+import { addProjects, addTasks, PersistMock } from "../../../utils/testing";
 import { Projects } from "../../projects/Projects";
 
+
 async function renderTasksAndSetup() {
-  render(<Projects />);
+  render(<Projects persist={new PersistMock()}/>);
   await addProjects(["Test project"]);
 }
 
@@ -133,10 +134,10 @@ describe("Tasks", () => {
       await userEvent.click(screen.getByText("Done"));
 
       expect(tasks.children.length).toBe(1)
-      expect(within(tasks).getByRole("checkbox")).not.toBeNull();
-      expect(within(tasks).getByText("task 1")).not.toBeNull();
-      expect(within(tasks).getByText("Edit")).not.toBeNull();
-      expect(within(tasks).getByText("Delete")).not.toBeNull();
+      expect(within(tasks).queryByRole("checkbox")).not.toBeNull();
+      expect(within(tasks).queryByText("task 1")).not.toBeNull();
+      expect(within(tasks).queryByText("Edit")).not.toBeNull();
+      expect(within(tasks).queryByText("Delete")).not.toBeNull();
     });
 
     it('should edit task text', async () => {
