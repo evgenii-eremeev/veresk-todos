@@ -179,9 +179,9 @@ describe("Projects", () => {
       });
       renderProjects(persist);
 
-      await userEvent.click(getProjectTab("Veresk"));
-      expect(screen.queryByText("task 1")).not.toBeNull();
-      expect(screen.queryByText("task 2")).not.toBeNull();
+      await userEvent.click(await findProjectTab("Veresk"));
+      expect(screen.findByText("task 1")).not.toBeNull();
+      expect(screen.findByText("task 2")).not.toBeNull();
     });
 
     it("should save state in the persistance state", async () => {
@@ -190,12 +190,12 @@ describe("Projects", () => {
       await addProjects(["Veresk"]);
       await addTasks(["task 1"])
 
-      expect(persist.get("projects")).toBeTruthy();
-      expect(persist.get("tasks")).toBeTruthy();
+      expect(await persist.get("projects")).toBeTruthy();
+      expect(await persist.get("tasks")).toBeTruthy();
 
-      const persistedProjects = JSON.parse(persist.get("projects"));
+      const persistedProjects = JSON.parse(await persist.get("projects"));
       expect(persistedProjects[0].name).toEqual("Veresk");
-      const persistedTasks = JSON.parse(persist.get("tasks"));
+      const persistedTasks = JSON.parse(await persist.get("tasks"));
       expect(persistedTasks[0].text).toEqual("task 1");
     });
 
@@ -205,7 +205,7 @@ describe("Projects", () => {
       });
       renderProjects(persist);
       await addProjects(["Candy"]);
-      const persistedProjects = JSON.parse(persist.get("projects"));
+      const persistedProjects = JSON.parse(await persist.get("projects"));
       expect(persistedProjects[0].name).toEqual("Candy");
       expect(persistedProjects[1].name).toEqual("Veresk");
     });
@@ -218,4 +218,8 @@ function getProjectTab(name: string) {
 
 function queryProjectTab(name: string) {
   return within(screen.getByRole("tablist")).queryByText(name);
+}
+
+function findProjectTab(name: string) {
+  return within(screen.getByRole("tablist")).findByText(name);
 }

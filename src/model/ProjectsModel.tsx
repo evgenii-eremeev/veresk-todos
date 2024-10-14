@@ -46,7 +46,11 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
   const [projects, setProjects] = useState<Array<Project>>([]);
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
 
-  usePersistance({ persist, setProjects, projects, tasks, setTasks });
+  const { setProjectsPersist, setTasksPersist } = usePersistance({
+    persist,
+    setProjects,
+    setTasks,
+  });
 
   return {
     tasks: tasks.filter((task) => task.projectId == currentProject?.id),
@@ -62,7 +66,7 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
   };
 
   function addTask(projectId: string, text: string) {
-    setTasks((tasks) => [...tasks, createNewTask(text, projectId)]);
+    setTasksPersist((tasks) => [...tasks, createNewTask(text, projectId)]);
   }
 
   function editTask(taskId: string, text: string) {
@@ -70,7 +74,7 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
   }
 
   function removeTask(taskId: string) {
-    setTasks((tasks) => tasks.filter((task) => task.id != taskId));
+    setTasksPersist((tasks) => tasks.filter((task) => task.id != taskId));
   }
 
   function toggleTaskCompleted(taskId: string) {
@@ -81,7 +85,7 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
     taskId: string,
     updater: (task: Task) => Partial<Omit<Task, "id" | "projectId">>
   ) {
-    setTasks((tasks) =>
+    setTasksPersist((tasks) =>
       tasks.map((task) => {
         if (task.id == taskId) {
           return {
@@ -102,11 +106,11 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
   }
 
   function addProject(project: Project) {
-    setProjects((projects) => [project, ...projects]);
+    setProjectsPersist((projects) => [project, ...projects]);
   }
 
   function removeProject(projectId: string) {
-    setProjects((projects) =>
+    setProjectsPersist((projects) =>
       projects.filter((project) => project.id != projectId)
     );
   }
@@ -116,33 +120,46 @@ function usePersistance({
   persist,
   setProjects,
   setTasks,
-  projects,
-  tasks
 }: {
   persist: Persist;
   setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
-  projects: Project[];
-  tasks: Task[];
 }) {
   useEffect(() => {
-    const projectsString = persist.get("projects");
+    loadState();
+  }, []);
+
+  async function loadState() {
+    const projectsString = await persist.get("projects").catch((error) => {
+      console.error("fail set persisted projects", error);
+    });
     if (projectsString) {
       setProjects(JSON.parse(projectsString));
     }
-    const tasksString = persist.get("tasks");
+    const tasksString = await persist.get("tasks").catch((error) => {
+      console.error("fail set persisted tasks", error);
+    });
     if (tasksString) {
       setTasks(JSON.parse(tasksString));
     }
-  }, []);
+  }
 
-  useEffect(() => {
-    persist.set("projects", JSON.stringify(projects));
-  }, [projects]);
-
-  useEffect(() => {
-    persist.set("tasks", JSON.stringify(tasks));
-  }, [tasks]);
+  return {
+    setProjectsPersist: (updater: (projects: Project[]) => Project[]) => {
+      setProjects((projects) => {
+        const updated = updater(projects);
+        persist.set("projects", JSON.stringify(updated)).catch(console.error);
+        return updated;
+      });
+    },
+    setTasksPersist: (updater: (tasks: Task[]) => Task[]) => {
+      setTasks((tasks) => {
+        const updated = updater(tasks);
+        persist.set("tasks", JSON.stringify(updated)).catch(console.error);
+        return updated;
+      });
+    },
+  };
 }
 
 export function createNewTask(text: string, projectId: string): Task {

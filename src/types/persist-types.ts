@@ -1,4 +1,4 @@
 export interface Persist {
-  set: (key: string, value: string) => void;
-  get: (key: string) => string;
+  set: (key: string, value: string) => Promise<void>;
+  get: (key: string) => Promise<string>;
 }

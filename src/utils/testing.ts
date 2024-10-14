@@ -28,10 +28,10 @@ export class PersistMock implements Persist {
   constructor(store: Record<string, string> = {}) {
     this.store = { ...store };
   }
-  set(key: string, value: string) {
+  async set(key: string, value: string) {
     this.store[key] = value;
   }
-  get(key: string) {
+  async get(key: string) {
     return this.store[key];
   }
 }
