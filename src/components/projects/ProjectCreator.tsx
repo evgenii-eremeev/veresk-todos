@@ -36,7 +36,9 @@ export function ProjectCreator() {
             value={newProjectName}
             onChange={(event) => setNewProjectName(event.target.value)}
           />
-          <Button type="submit">Create</Button>
+          <Button type="submit" disabled={!newProjectName}>
+            Create
+          </Button>
         </form>
       )}
     </div>

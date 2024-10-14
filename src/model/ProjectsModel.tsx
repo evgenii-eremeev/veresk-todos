@@ -50,6 +50,9 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
     persist,
     setProjects,
     setTasks,
+    onStateLoaded({ projects }) {
+      setCurrentProject(projects[0] ?? null);
+    },
   });
 
   return {
@@ -120,28 +123,30 @@ function usePersistance({
   persist,
   setProjects,
   setTasks,
+  onStateLoaded,
 }: {
   persist: Persist;
   setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  onStateLoaded: ({
+    projects,
+    tasks,
+  }: {
+    projects: Project[];
+    tasks: Task[];
+  }) => void;
 }) {
   useEffect(() => {
-    loadState();
+    loadState().then(onStateLoaded);
   }, []);
 
   async function loadState() {
-    const projectsString = await persist.get("projects").catch((error) => {
-      console.error("fail set persisted projects", error);
-    });
-    if (projectsString) {
-      setProjects(JSON.parse(projectsString));
-    }
-    const tasksString = await persist.get("tasks").catch((error) => {
-      console.error("fail set persisted tasks", error);
-    });
-    if (tasksString) {
-      setTasks(JSON.parse(tasksString));
-    }
+    const projects = await persist.getParsed<Project[]>("projects", []);
+    const tasks = await persist.getParsed<Task[]>("tasks", []);
+
+    setProjects(projects);
+    setTasks(tasks);
+    return { projects, tasks };
   }
 
   return {

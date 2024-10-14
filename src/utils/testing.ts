@@ -1,6 +1,6 @@
 import userEvent from "@testing-library/user-event";
 import { screen } from "@testing-library/react";
-import { Persist } from "../types/persist-types";
+import { Persist } from "./persist";
 
 export function hasClass(elem: HTMLElement, className: string) {
   return elem.classList.contains(className);
@@ -23,9 +23,10 @@ export async function addTasks(taskNames: Array<string>) {
   }
 }
 
-export class PersistMock implements Persist {
+export class PersistMock extends Persist {
   store: Record<string, string>;
   constructor(store: Record<string, string> = {}) {
+    super()
     this.store = { ...store };
   }
   async set(key: string, value: string) {

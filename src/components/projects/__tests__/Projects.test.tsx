@@ -18,9 +18,10 @@ function renderProjects(persist: Persist = new PersistMock()) {
 describe("Projects", () => {
   it("should not create a project with empty name", async () => {
     renderProjects();
-    const projects = screen.getByRole("tablist");
-
+    const projects = await screen.findByRole("tablist");
     await userEvent.click(screen.getByText("New project"));
+    await userEvent.click(screen.getByText("Create"));
+    
     expect(projects.children).toHaveLength(0);
   });
 
@@ -48,7 +49,7 @@ describe("Projects", () => {
     renderProjects();
     await userEvent.click(screen.getByText("New project"));
     expect(screen.queryByRole("form")).toBeTruthy();
-    await userEvent.click(screen.getByText("Create"));
+    await userEvent.keyboard("my project {Enter}");
     expect(screen.queryByRole("form")).toBeNull();
   });
 
@@ -179,9 +180,9 @@ describe("Projects", () => {
       });
       renderProjects(persist);
 
-      await userEvent.click(await findProjectTab("Veresk"));
-      expect(screen.findByText("task 1")).not.toBeNull();
-      expect(screen.findByText("task 2")).not.toBeNull();
+      expect(await findProjectTab("Veresk")).not.toBeNull();
+      expect(await screen.findByText("task 1")).not.toBeNull();
+      expect(await screen.findByText("task 2")).not.toBeNull();
     });
 
     it("should save state in the persistance state", async () => {
