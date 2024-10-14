@@ -1,7 +1,7 @@
 import { writeFile, readFile, access } from "fs/promises";
 import { constants } from "fs";
 import { resolve } from "path";
-import { Persist as PersistType } from "../types/persist-types";
+import { Persist as PersistType } from "../types/persist-types"; 
 
 export class Persist implements PersistType {
   async set(key: string, value: string) {
@@ -16,7 +16,6 @@ export class Persist implements PersistType {
     }
   }
   private getFilePath(key: string) {
-    // @ts-ignore:next-line
     return resolve(Pear.config.storage, `./${key}.json`);
   }
 }
