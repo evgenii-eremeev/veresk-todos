@@ -3,5 +3,5 @@ import React from "react";
 import { App } from "./components/app/App";
 
 
-const root = createRoot(document.getElementById("root"));
+const root = createRoot(document.getElementById("root")!);
 root.render(<App />);
