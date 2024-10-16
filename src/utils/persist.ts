@@ -1,5 +1,5 @@
 import { writeFile, readFile, access } from "fs/promises";
-import { constants } from "fs";
+import { constants, mkdirSync, existsSync } from "fs";
 import { resolve } from "path";
 import { Persist as PersistType } from "../types/persist-types";
 
@@ -24,7 +24,15 @@ export class Persist implements PersistType {
       );
   }
   private getFilePath(key: string) {
-    return resolve(Pear.config.storage, `./${key}.json`);
+    const root = process.env.STORAGE ?? Pear.config.storage;
+    try {
+      if (!existsSync(root)) {
+        mkdirSync(root);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    return resolve(root, `./${key}.json`);
   }
 }
 

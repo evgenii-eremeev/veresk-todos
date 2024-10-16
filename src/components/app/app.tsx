@@ -10,7 +10,7 @@ export function App() {
   return (
     <>
       <Projects persist={persist} />
-      <Chat swarm={new Swarm} createTopic={createTopic}/>
+      <Chat swarm={new Swarm()} createTopic={createTopic} />
     </>
   );
 }
