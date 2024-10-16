@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Swarm } from "../../types/swarm-types";
 import { isValidTopic } from "../../backend/swarm";
 
@@ -9,6 +9,13 @@ interface Props {
 
 export function Chat({ swarm, createTopic }: Props) {
   const [topic, setTopic] = useState<string | null>(null);
+  const [peerCount, setPeerCount] = useState(0);
+
+  useEffect(() => {
+    swarm.onConnectionsUpdate(connections => {
+      setPeerCount(connections.length)
+    })
+  }, [])
 
   return (
     <div>
@@ -23,6 +30,7 @@ export function Chat({ swarm, createTopic }: Props) {
       ) : (
         <>
           <p>{topic}</p>
+          <p>Peers: {peerCount}</p>
           <MessageEditor onSubmit={(message) => swarm.sendAll(message)} />
         </>
       )}
