@@ -13,7 +13,7 @@ export function Chat({ swarm, createTopic }: Props) {
 
   useEffect(() => {
     swarm.onConnectionsUpdate(connections => {
-      setPeerCount(connections.length)
+      setPeerCount(connections.size)
     })
   }, [])
 

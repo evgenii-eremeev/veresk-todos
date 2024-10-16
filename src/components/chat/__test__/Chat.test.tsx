@@ -107,11 +107,11 @@ describe("Chat", () => {
     await screen.findByText("Peers: 0");
   });
 
-  it("should show peers count 1 after someone joins", async () => {
+  it("should show right peers count after someone joins", async () => {
     const swarm = new SwarmMock();
     renderChat({ swarm });
     await clickStartChat();
-    
+
     const peers = [{}, {}, {}];
     for (let i = 0; i < peers.length; i++) {
       act(() => {
@@ -131,16 +131,16 @@ async function clickJoinChat() {
 }
 
 class SwarmMock implements Swarm {
-  connections: Peer[] = [];
+  connections: Set<Peer> = new Set();
   eventCallbacks = {
     peerConnected: (peer: Peer) => {},
-    connectionsUpdate: (connections: Peer[]) => {},
+    connectionsUpdate: (connections: Set<Peer>) => {},
   };
 
   join = jest.fn().mockResolvedValue(undefined);
   sendAll = jest.fn();
 
-  onConnectionsUpdate(cb: (connections: Peer[]) => void) {
+  onConnectionsUpdate(cb: (connections: Set<Peer>) => void) {
     this.eventCallbacks.connectionsUpdate = cb;
   }
 
@@ -149,7 +149,7 @@ class SwarmMock implements Swarm {
   }
 
   simulatePeerConnection(peer: Peer) {
-    this.connections.push(peer);
+    this.connections.add(peer);
     this.eventCallbacks.peerConnected(peer);
     this.eventCallbacks.connectionsUpdate(this.connections);
   }
