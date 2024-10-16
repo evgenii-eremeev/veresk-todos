@@ -5,4 +5,3 @@ import { App } from "./components/app/App";
 
 const root = createRoot(document.getElementById("root")!);
 root.render(<App />);
-Pear.updates(() => Pear.reload());

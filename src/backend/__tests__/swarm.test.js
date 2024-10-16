@@ -1,5 +1,5 @@
-import { Swarm } from "../swarm";
-import b4a from 'b4a';
+import { Swarm, createTopic } from "../swarm";
+import b4a from "b4a";
 
 describe("swarm", () => {
   let Pear;
@@ -36,8 +36,8 @@ describe("swarm", () => {
     const swarm = new Swarm({ Hyperswarm: HyperswarmMock, Pear });
     const connectionsUpdateCallback = jest.fn();
     swarm.onConnectionsUpdate(connectionsUpdateCallback);
-    swarm.swarm.simulateEvent("update", new Set);
-    expect(connectionsUpdateCallback).toHaveBeenNthCalledWith(1, new Set);
+    swarm.swarm.simulateEvent("update", new Set());
+    expect(connectionsUpdateCallback).toHaveBeenNthCalledWith(1, new Set());
     const connections = new Set(["conn1", "conn2"]);
     swarm.swarm.simulateEvent("update", connections);
     expect(connectionsUpdateCallback).toHaveBeenNthCalledWith(2, connections);
@@ -76,14 +76,15 @@ describe("swarm", () => {
   });
 
   it("should create topic", () => {
-    const topic = Swarm.createTopic();
+    const topic = createTopic();
     expect(typeof topic).toBe("string");
     expect(topic).toHaveLength(64);
   });
 
   it("should throw error if joining swarm with invalid topic string", async () => {
     const swarm = new Swarm({ Hyperswarm: HyperswarmMock, Pear });
-    const errorMessage = "invalid hex length, resulting buffer should be size of 32";
+    const errorMessage =
+      "invalid hex length, resulting buffer should be size of 32";
     await expect(swarm.join("foobar")).rejects.toEqual(Error(errorMessage));
     await expect(swarm.join("a".repeat(10))).rejects.toEqual(
       Error(errorMessage)
@@ -96,31 +97,35 @@ describe("swarm", () => {
     const swarm = new Swarm({ Hyperswarm: HyperswarmMock, Pear });
     const topic = "f".repeat(64);
     swarm.join("f".repeat(64));
-    expect(swarm.swarm.join).toHaveBeenCalledWith(b4a.from(topic, "hex"), { client: true, server: true });
+    expect(swarm.swarm.join).toHaveBeenCalledWith(b4a.from(topic, "hex"), {
+      client: true,
+      server: true,
+    });
     expect(swarm.swarm.flushed).toHaveBeenCalled();
   });
-  it('should send data', () => {
+  it("should send data", () => {
     const swarm = new Swarm({ Hyperswarm: HyperswarmMock, Pear });
     const peer1 = new PeerMock("pubkey1");
     const peer2 = new PeerMock("pubkey2");
     swarm.swarm.simulateEvent("connection", peer1);
     swarm.swarm.simulateEvent("connection", peer2);
-    swarm.sendAll('some data');
-    expect(peer1.write).toHaveBeenCalledWith('some data');
-    expect(peer2.write).toHaveBeenCalledWith('some data');
+    swarm.sendAll("some data");
+    const buffer = b4a.from("some data", "utf8");
+    expect(peer1.write).toHaveBeenCalledWith(buffer);
+    expect(peer2.write).toHaveBeenCalledWith(buffer);
   });
 });
 
 class HyperswarmMock {
   eventCallbacks = {
     update: () => {},
-    connection: () => {}
+    connection: () => {},
   };
-  connections = new Set;
+  connections = new Set();
   destroy = jest.fn();
   flushed = jest.fn().mockResolvedValue();
   join = jest.fn(() => ({
-    flushed: this.flushed
+    flushed: this.flushed,
   }));
 
   on(event, cb) {
@@ -130,16 +135,15 @@ class HyperswarmMock {
   simulateEvent(event, payload) {
     switch (event) {
       case "update":
-        this.connections = payload || new Set;
+        this.connections = payload || new Set();
         this.eventCallbacks[event]();
         break;
       case "connection":
-        this.connections.add(payload)
+        this.connections.add(payload);
         this.eventCallbacks[event](payload);
         break;
     }
   }
-  
 }
 
 function createPear() {
@@ -155,7 +159,7 @@ function createPear() {
 }
 
 class PeerMock {
-  write = jest.fn()
+  write = jest.fn();
   constructor(pubKey) {
     this.remotePublicKey = pubKey;
     this.eventCallbacks = {};

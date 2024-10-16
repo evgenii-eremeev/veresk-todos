@@ -3,9 +3,9 @@ import crypto from "hypercore-crypto";
 import b4a from "b4a";
 
 export class Swarm {
-  constructor({ Hyperswarm, Pear } = { Hyperswarm, Pear }) {
-    this.swarm = new Hyperswarm();
-    Pear.teardown(() => this.swarm.destroy());
+  constructor(deps = { Hyperswarm, Pear }) {
+    this.swarm = new deps.Hyperswarm();
+    deps.Pear.teardown(() => this.swarm.destroy());
   }
 
   onConnectionsUpdate(cb) {
@@ -29,7 +29,7 @@ export class Swarm {
   }
 
   async join(topic) {
-    const topicBuffer = Swarm.topicToBuffer(topic);
+    const topicBuffer = topicToBuffer(topic);
     const discovery = this.swarm.join(topicBuffer, {
       client: true,
       server: true,
@@ -37,25 +37,29 @@ export class Swarm {
     await discovery.flushed();
   }
 
-  sendAll(data) {
+  sendAll(message) {
+    const data = b4a.from(message, "utf8");
     for (const peer of this.swarm.connections) {
       peer.write(data);
     }
   }
-
-  static createTopic() {
-    return crypto.randomBytes(32).toString("hex");
-  }
-
-  static topicToBuffer(topicString) {
-    const buffer = b4a.from(topicString, "hex");
-    validateTopicBuffer(buffer);
-    return buffer;
-  }
 }
 
-function validateTopicBuffer(buffer) {
-  if (buffer.length !== 32) {
+export function createTopic() {
+  return crypto.randomBytes(32).toString("hex");
+}
+
+function topicToBuffer(topicString) {
+  if (!isValidTopic(topicString)) {
     throw Error("invalid hex length, resulting buffer should be size of 32");
   }
+  return getBufferFromHex(topicString);
+}
+
+export function isValidTopic(topic) {
+  return getBufferFromHex(topic).length == 32
+}
+
+function getBufferFromHex(hex) {
+  return b4a.from(hex, "hex")
 }
