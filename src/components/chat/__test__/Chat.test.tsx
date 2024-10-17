@@ -73,7 +73,8 @@ describe("Chat", () => {
     await clickStartChat();
     const input: HTMLInputElement = screen.getByLabelText("Message");
     await userEvent.click(input);
-    await userEvent.keyboard("msg{Enter}");
+    await userEvent.type(input, "msg");
+    await userEvent.click(await screen.findByText("Send"));
     expect(input.value).toBe("");
   });
 
@@ -93,10 +94,7 @@ describe("Chat", () => {
     renderChat({ swarm });
     await clickStartChat();
     act(() => {
-      swarm.simulatePeerData(
-        { pubKey: "abcdef" },
-        "received message 1"
-      );
+      swarm.simulatePeerData({ pubKey: "abcdef" }, "received message 1");
     });
     screen.getByText("abcd: received message 1");
   });
@@ -134,6 +132,16 @@ describe("Chat", () => {
     expect(swarm.join).toHaveBeenCalledWith(topic);
   });
 
+  it("should join by clicking Join button in Join Chat flow", async () => {
+    const swarm = new SwarmMock();
+    renderChat({ swarm });
+    await clickJoinChat();
+    const topic = "f".repeat(64);
+    await userEvent.type(screen.getByLabelText("Topic"), topic);
+    await userEvent.click(screen.getByText("Join"));
+    expect(swarm.join).toHaveBeenCalledWith(topic);
+  });
+
   it("should show peers count 0 after creating chat", async () => {
     renderChat();
     await clickStartChat();
@@ -153,6 +161,7 @@ describe("Chat", () => {
       await screen.findByText(`Peers: ${i + 1}`);
     }
   });
+
 });
 
 async function clickStartChat() {
