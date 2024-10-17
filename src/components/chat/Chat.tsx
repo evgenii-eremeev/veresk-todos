@@ -1,33 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { Swarm } from "../../types/swarm-types";
+import React, { useState } from "react";
 import { isValidTopic } from "../../backend/swarm";
-import { Message } from "../../types/communication-types";
 import { Button } from "../common/Button";
+import { useSwarm } from "../../model/SwarmModel";
 
-interface Props {
-  swarm: Swarm;
-  createTopic: () => string;
-}
-
-export function Chat({ swarm, createTopic }: Props) {
-  const [topic, setTopic] = useState<string | null>(null);
-  const [peerCount, setPeerCount] = useState(0);
-  const [messages, setMessages] = useState<Array<Message>>([]);
+export function Chat() {
   const [isJoining, setIsJoining] = useState(false);
-
-  useEffect(() => {
-    swarm.onConnectionsUpdate((connections) => {
-      setPeerCount(connections.size);
-    });
-
-    swarm.onPeerData((peer, data) => {
-      addMessage(data, peer.pubKey.slice(0, 4));
-    });
-  }, []);
-
-  function addMessage(text: string, from: string) {
-    setMessages((messages) => [...messages, { text, from }]);
-  }
+  const {
+    topic,
+    setTopic,
+    peerCount,
+    messages,
+    addMessage,
+    swarm,
+    createTopic,
+  } = useSwarm();
 
   return (
     <div>
@@ -36,7 +22,7 @@ export function Chat({ swarm, createTopic }: Props) {
           onTopic={async (topic) => {
             setIsJoining(true);
             await swarm.join(topic);
-            setIsJoining(false)
+            setIsJoining(false);
             setTopic(topic);
           }}
           createTopic={createTopic}

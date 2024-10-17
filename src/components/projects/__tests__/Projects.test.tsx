@@ -7,12 +7,20 @@ import {
   addTasks,
   hasClass,
   PersistMock,
+  SwarmMock,
 } from "../../../utils/testing";
 import { createNewProject, createNewTask } from "../../../model/ProjectsModel";
 import { Persist } from "../../../types/persist-types";
+import { createTopic } from "../../../backend/swarm";
 
 function renderProjects(persist: Persist = new PersistMock()) {
-  render(<Projects persist={persist} />);
+  render(
+    <Projects
+      persist={persist}
+      swarm={new SwarmMock()}
+      createTopic={createTopic}
+    />
+  );
 }
 
 describe("Projects", () => {
@@ -21,7 +29,7 @@ describe("Projects", () => {
     const projects = await screen.findByRole("tablist");
     await userEvent.click(screen.getByText("New project"));
     await userEvent.click(screen.getByText("Create"));
-    
+
     expect(projects.children).toHaveLength(0);
   });
 
@@ -189,7 +197,7 @@ describe("Projects", () => {
       const persist = new PersistMock();
       renderProjects(persist);
       await addProjects(["Veresk"]);
-      await addTasks(["task 1"])
+      await addTasks(["task 1"]);
 
       expect(await persist.get("projects")).toBeTruthy();
       expect(await persist.get("tasks")).toBeTruthy();

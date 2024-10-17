@@ -8,9 +8,6 @@ const persist = new Persist();
 
 export function App() {
   return (
-    <>
-      <Projects persist={persist} />
-      <Chat swarm={new Swarm()} createTopic={createTopic} />
-    </>
+    <Projects persist={persist} createTopic={createTopic} swarm={new Swarm()} />
   );
 }

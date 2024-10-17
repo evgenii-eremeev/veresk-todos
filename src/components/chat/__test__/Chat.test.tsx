@@ -4,12 +4,18 @@ import userEvent from "@testing-library/user-event";
 import { Chat } from "../Chat";
 import { Peer, Swarm } from "../../../types/swarm-types";
 import { createTopic as originalCreateTopic } from "../../../backend/swarm";
+import { SwarmModelProvider } from "../../../model/SwarmModel";
+import { SwarmMock } from "../../../utils/testing";
 
 function renderChat({
   swarm = new SwarmMock(),
   createTopic = originalCreateTopic,
 }: { swarm?: Swarm; createTopic?: () => string } = {}) {
-  render(<Chat swarm={swarm} createTopic={createTopic} />);
+  render(
+    <SwarmModelProvider swarm={swarm} createTopic={createTopic}>
+      <Chat />
+    </SwarmModelProvider>
+  );
 }
 
 describe("Chat", () => {
@@ -161,7 +167,6 @@ describe("Chat", () => {
       await screen.findByText(`Peers: ${i + 1}`);
     }
   });
-
 });
 
 async function clickStartChat() {
@@ -172,36 +177,3 @@ async function clickJoinChat() {
   return userEvent.click(screen.getByText("Join Chat"));
 }
 
-class SwarmMock implements Swarm {
-  connections: Set<Peer> = new Set();
-  eventCallbacks = {
-    peerConnected: (peer: Peer) => {},
-    connectionsUpdate: (connections: Set<Peer>) => {},
-    peerData: (peer: Peer, data: string) => {},
-  };
-
-  join = jest.fn().mockResolvedValue(undefined);
-  sendAll = jest.fn();
-
-  onConnectionsUpdate(cb: (connections: Set<Peer>) => void) {
-    this.eventCallbacks.connectionsUpdate = cb;
-  }
-
-  onPeerConnected(cb: (peer: Peer) => void) {
-    this.eventCallbacks.peerConnected = cb;
-  }
-
-  onPeerData(cb: (peer: Peer, data: string) => void) {
-    this.eventCallbacks.peerData = cb;
-  }
-
-  simulatePeerConnection(peer: Peer) {
-    this.connections.add(peer);
-    this.eventCallbacks.peerConnected(peer);
-    this.eventCallbacks.connectionsUpdate(this.connections);
-  }
-
-  simulatePeerData(peer: Peer, data: string) {
-    this.eventCallbacks.peerData(peer, data);
-  }
-}

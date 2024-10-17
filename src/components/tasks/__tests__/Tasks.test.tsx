@@ -1,12 +1,23 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
-import { addProjects, addTasks, PersistMock } from "../../../utils/testing";
+import {
+  addProjects,
+  addTasks,
+  PersistMock,
+  SwarmMock,
+} from "../../../utils/testing";
 import { Projects } from "../../projects/Projects";
-
+import { createTopic } from "../../../backend/swarm";
 
 async function renderTasksAndSetup() {
-  render(<Projects persist={new PersistMock()}/>);
+  render(
+    <Projects
+      persist={new PersistMock()}
+      swarm={new SwarmMock()}
+      createTopic={createTopic}
+    />
+  );
   await addProjects(["Test project"]);
 }
 
@@ -133,21 +144,21 @@ describe("Tasks", () => {
       await userEvent.click(screen.getByText("Edit"));
       await userEvent.click(screen.getByText("Done"));
 
-      expect(tasks.children.length).toBe(1)
+      expect(tasks.children.length).toBe(1);
       expect(within(tasks).queryByRole("checkbox")).not.toBeNull();
       expect(within(tasks).queryByText("task 1")).not.toBeNull();
       expect(within(tasks).queryByText("Edit")).not.toBeNull();
       expect(within(tasks).queryByText("Delete")).not.toBeNull();
     });
 
-    it('should edit task text', async () => {
+    it("should edit task text", async () => {
       await renderTasksAndSetup();
       await addTasks(["task 1"]);
 
       await userEvent.click(screen.getByText("Edit"));
-      await userEvent.keyboard(' updated{Enter}')
+      await userEvent.keyboard(" updated{Enter}");
 
       expect(screen.getByText("task 1 updated")).not.toBeNull();
-    })
+    });
   });
 });
