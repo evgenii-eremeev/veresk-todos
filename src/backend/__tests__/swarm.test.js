@@ -62,7 +62,7 @@ describe("swarm", () => {
     const peer = new PeerMock("abc");
     swarm.swarm.simulateEvent("connection", peer);
     peer.simulateEvent("data", "some data");
-    expect(peerDataCallback).toHaveBeenCalledWith(peer, "some data");
+    expect(peerDataCallback).toHaveBeenCalledWith(peer.out(), "some data");
   });
 
   it("should call peer error event handler", () => {
@@ -72,7 +72,7 @@ describe("swarm", () => {
     const peer = new PeerMock("abc");
     swarm.swarm.simulateEvent("connection", peer);
     peer.simulateEvent("error", "some error");
-    expect(peerErrorCallback).toHaveBeenCalledWith(peer, "some error");
+    expect(peerErrorCallback).toHaveBeenCalledWith(peer.out(), "some error");
   });
 
   it("should create topic", () => {
@@ -171,5 +171,9 @@ class PeerMock {
 
   simulateEvent(event, payload) {
     this.eventCallbacks[event](payload);
+  }
+
+  out() {
+    return { pubKey: this.remotePublicKey.toString("hex") };
   }
 }

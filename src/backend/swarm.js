@@ -18,7 +18,9 @@ export class Swarm {
 
   onPeerData(cb) {
     this.onPeerConnected((swarmPeer) => {
-      swarmPeer.on("data", (data) => cb(toPeer(swarmPeer), data.toString("utf8")));
+      swarmPeer.on("data", (data) =>
+        cb(toPeer(swarmPeer), data.toString("utf8"))
+      );
     });
   }
 
