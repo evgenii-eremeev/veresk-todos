@@ -68,6 +68,39 @@ describe("Chat", () => {
     expect(swarm.sendAll).toHaveBeenCalledWith("msg");
   });
 
+  it("should clear message input after send", async () => {
+    renderChat();
+    await clickStartChat();
+    const input: HTMLInputElement = screen.getByLabelText("Message");
+    await userEvent.click(input);
+    await userEvent.keyboard("msg{Enter}");
+    expect(input.value).toBe("");
+  });
+
+  it("should display message after sending it", async () => {
+    renderChat();
+    await clickStartChat();
+    await userEvent.click(screen.getByLabelText("Message"));
+    const messages = ["foo", "bar", "baz"];
+    for (const message of messages) {
+      await userEvent.keyboard(`${message}{Enter}`);
+      screen.getByText(`me: ${message}`);
+    }
+  });
+
+  it("should display message after receiving it", async () => {
+    const swarm = new SwarmMock();
+    renderChat({ swarm });
+    await clickStartChat();
+    act(() => {
+      swarm.simulatePeerData(
+        { pubKey: "abcdef" },
+        "received message 1"
+      );
+    });
+    screen.getByText("abcd: received message 1");
+  });
+
   it("should show input after Join Chat click", async () => {
     renderChat();
     expect(screen.queryByLabelText("Topic")).toBeNull();
@@ -112,11 +145,11 @@ describe("Chat", () => {
     renderChat({ swarm });
     await clickStartChat();
 
-    const peers = [{}, {}, {}];
+    const peers = [{}, {}, {}] as Array<Peer>;
     for (let i = 0; i < peers.length; i++) {
       act(() => {
         swarm.simulatePeerConnection(peers[i]);
-      })
+      });
       await screen.findByText(`Peers: ${i + 1}`);
     }
   });
@@ -135,6 +168,7 @@ class SwarmMock implements Swarm {
   eventCallbacks = {
     peerConnected: (peer: Peer) => {},
     connectionsUpdate: (connections: Set<Peer>) => {},
+    peerData: (peer: Peer, data: string) => {},
   };
 
   join = jest.fn().mockResolvedValue(undefined);
@@ -148,9 +182,17 @@ class SwarmMock implements Swarm {
     this.eventCallbacks.peerConnected = cb;
   }
 
+  onPeerData(cb: (peer: Peer, data: string) => void) {
+    this.eventCallbacks.peerData = cb;
+  }
+
   simulatePeerConnection(peer: Peer) {
     this.connections.add(peer);
     this.eventCallbacks.peerConnected(peer);
     this.eventCallbacks.connectionsUpdate(this.connections);
+  }
+
+  simulatePeerData(peer: Peer, data: string) {
+    this.eventCallbacks.peerData(peer, data);
   }
 }

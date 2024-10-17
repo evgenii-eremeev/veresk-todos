@@ -17,14 +17,14 @@ export class Swarm {
   }
 
   onPeerData(cb) {
-    this.onPeerConnected((peer) => {
-      peer.on("data", (data) => cb(peer, data));
+    this.onPeerConnected((swarmPeer) => {
+      swarmPeer.on("data", (data) => cb(toPeer(swarmPeer), data.toString("utf8")));
     });
   }
 
   onPeerError(cb) {
-    this.onPeerConnected((peer) => {
-      peer.on("error", (error) => cb(peer, error));
+    this.onPeerConnected((swarmPeer) => {
+      swarmPeer.on("error", (error) => cb(toPeer(swarmPeer), error));
     });
   }
 
@@ -57,9 +57,15 @@ function topicToBuffer(topicString) {
 }
 
 export function isValidTopic(topic) {
-  return getBufferFromHex(topic).length == 32
+  return getBufferFromHex(topic).length == 32;
 }
 
 function getBufferFromHex(hex) {
-  return b4a.from(hex, "hex")
+  return b4a.from(hex, "hex");
+}
+
+export function toPeer(hyperswarmPeer) {
+  return {
+    pubKey: hyperswarmPeer.remotePublicKey.toString("hex"),
+  };
 }

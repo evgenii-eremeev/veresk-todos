@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Swarm } from "../../types/swarm-types";
 import { isValidTopic } from "../../backend/swarm";
+import { Message } from "../../types/communication-types";
 
 interface Props {
   swarm: Swarm;
@@ -10,12 +11,21 @@ interface Props {
 export function Chat({ swarm, createTopic }: Props) {
   const [topic, setTopic] = useState<string | null>(null);
   const [peerCount, setPeerCount] = useState(0);
+  const [messages, setMessages] = useState<Array<Message>>([]);
 
   useEffect(() => {
-    swarm.onConnectionsUpdate(connections => {
-      setPeerCount(connections.size)
-    })
-  }, [])
+    swarm.onConnectionsUpdate((connections) => {
+      setPeerCount(connections.size);
+    });
+
+    swarm.onPeerData((peer, data) => {
+      addMessage(data, peer.pubKey.slice(0, 4));
+    });
+  }, []);
+
+  function addMessage(text: string, from: string) {
+    setMessages((messages) => [...messages, { text, from }]);
+  }
 
   return (
     <div>
@@ -31,7 +41,22 @@ export function Chat({ swarm, createTopic }: Props) {
         <>
           <p>{topic}</p>
           <p>Peers: {peerCount}</p>
-          <MessageEditor onSubmit={(message) => swarm.sendAll(message)} />
+          <div>
+            {messages.map((message, idx) => (
+              <p key={message.text + idx}>
+                {`${message.from}: ${message.text}`}
+              </p>
+            ))}
+          </div>
+          <MessageEditor
+            onSubmit={(message) => {
+              setMessages((messages) => [
+                ...messages,
+                { text: message, from: "me" },
+              ]);
+              swarm.sendAll(message);
+            }}
+          />
         </>
       )}
     </div>
@@ -99,6 +124,7 @@ function MessageEditor({ onSubmit }: { onSubmit: (message: string) => void }) {
       onSubmit={(event) => {
         event.preventDefault();
         onSubmit(message);
+        setMessage("");
       }}
     >
       <label htmlFor="message-input">Message</label>
