@@ -28,13 +28,13 @@ export function SwarmModelProvider({
 
 export type CreateTopic = () => string;
 export interface SwarmModel {
-  addMessage: (text: string, from: string) => void;
   createTopic: CreateTopic;
   topic: string | null;
-  setTopic: (topic: string) => void;
   peerCount: number;
   messages: Array<Message>;
-  swarm: SwarmI;
+  joinTopic: (topic: string) => Promise<void>;
+  isJoining: boolean;
+  sendAll: (text: string) => void;
 }
 
 function useSwarmModel({
@@ -47,6 +47,7 @@ function useSwarmModel({
   const [topic, setTopic] = useState<string | null>(null);
   const [peerCount, setPeerCount] = useState(0);
   const [messages, setMessages] = useState<Array<Message>>([]);
+  const [isJoining, setIsJoining] = useState(false);
 
   useEffect(() => {
     swarm.onConnectionsUpdate((connections) => {
@@ -62,13 +63,25 @@ function useSwarmModel({
     setMessages((messages) => [...messages, { text, from }]);
   }
 
+  async function joinTopic(topic: string) {
+    setIsJoining(true);
+    await swarm.join(topic);
+    setIsJoining(false);
+    setTopic(topic);
+  }
+
+  function sendAll(text: string) {
+    addMessage(text, "me");
+    swarm.sendAll(text);
+  }
+
   return {
-    addMessage,
     topic,
-    setTopic,
     createTopic,
     peerCount,
     messages,
-    swarm
+    joinTopic,
+    isJoining,
+    sendAll
   };
 }

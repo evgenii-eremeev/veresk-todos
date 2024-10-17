@@ -2,29 +2,24 @@ import React, { useState } from "react";
 import { isValidTopic } from "../../backend/swarm";
 import { Button } from "../common/Button";
 import { useSwarm } from "../../model/SwarmModel";
+import { Message } from "../../types/communication-types";
 
 export function Chat() {
-  const [isJoining, setIsJoining] = useState(false);
   const {
     topic,
-    setTopic,
     peerCount,
-    messages,
-    addMessage,
-    swarm,
     createTopic,
+    joinTopic,
+    isJoining,
+    sendAll,
+    messages
   } = useSwarm();
 
   return (
     <div>
       {!topic ? (
         <StartPanel
-          onTopic={async (topic) => {
-            setIsJoining(true);
-            await swarm.join(topic);
-            setIsJoining(false);
-            setTopic(topic);
-          }}
+          onTopic={joinTopic}
           createTopic={createTopic}
           isJoining={isJoining}
         />
@@ -32,19 +27,8 @@ export function Chat() {
         <>
           <p>{topic}</p>
           <p>Peers: {peerCount}</p>
-          <div className="h-24 overflow-y-auto text-wrap">
-            {messages.map((message, idx) => (
-              <p key={message.text + idx}>
-                {`${message.from}: ${message.text}`}
-              </p>
-            ))}
-          </div>
-          <MessageEditor
-            onSubmit={(message) => {
-              addMessage(message, "me");
-              swarm.sendAll(message);
-            }}
-          />
+          <Messages messages={messages} />
+          <MessageEditor onSubmit={sendAll} />
         </>
       )}
     </div>
@@ -81,6 +65,16 @@ function StartPanel({
         Join Chat
       </Button>
       {showTopicForm && <TopicEditor onSubmit={onTopic} />}
+    </div>
+  );
+}
+
+function Messages({messages}: {messages: Message[]}) {
+  return (
+    <div className="h-24 overflow-y-auto text-wrap">
+      {messages.map((message, idx) => (
+        <p key={message.text + idx}>{`${message.from}: ${message.text}`}</p>
+      ))}
     </div>
   );
 }
