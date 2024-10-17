@@ -5,7 +5,7 @@
     "name": "veresk-todos",
     "type": "desktop",
     "gui": {
-      "height": 540,
+      "height": 640,
       "width": 720
     }
   },

@@ -16,7 +16,7 @@ export function Chat() {
   } = useSwarm();
 
   return (
-    <div>
+    <div className="border-2 border-gray-600 h-64 mr-2 my-2 p-2">
       {!topic ? (
         <StartPanel
           onTopic={joinTopic}
@@ -71,7 +71,7 @@ function StartPanel({
 
 function Messages({messages}: {messages: Message[]}) {
   return (
-    <div className="h-24 overflow-y-auto text-wrap">
+    <div className="h-40 overflow-y-auto text-wrap">
       {messages.map((message, idx) => (
         <p key={message.text + idx}>{`${message.from}: ${message.text}`}</p>
       ))}
