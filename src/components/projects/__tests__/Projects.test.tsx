@@ -13,20 +13,19 @@ import { createNewProject, createNewTask } from "../../../model/ProjectsModel";
 import { Persist } from "../../../types/persist-types";
 import { createTopic as originalCreateTopic } from "../../../backend/swarm";
 import { CreateTopic } from "../../../model/SwarmModel";
+import { Swarm } from "../../../types/swarm-types";
 
 function renderProjects({
   persist = new PersistMock(),
   createTopic = originalCreateTopic,
+  swarm = new SwarmMock(),
 }: {
   persist?: Persist;
   createTopic?: CreateTopic;
+  swarm?: Swarm;
 } = {}) {
   render(
-    <Projects
-      persist={persist}
-      swarm={new SwarmMock()}
-      createTopic={createTopic}
-    />
+    <Projects persist={persist} swarm={swarm} createTopic={createTopic} />
   );
 }
 
@@ -317,6 +316,39 @@ describe("Projects", () => {
       await userEvent.click(screen.getByText("Share project"));
       const persistedProject = JSON.parse(await persist.get("projects"))[0];
       expect(persistedProject.topic).toBe(topic);
+    });
+  });
+
+  describe("join", () => {
+    it("should have join project button", async () => {
+      renderProjects();
+      await screen.findByText("Join project");
+    });
+    it("should show input after clicking", async () => {
+      renderProjects();
+      await userEvent.click(screen.getByText("Join project"));
+      screen.getByLabelText("Topic");
+    });
+    it("should join swarm on submit", async () => {
+      const swarm = new SwarmMock();
+      renderProjects({ swarm });
+      await userEvent.click(screen.getByText("Join project"));
+      const topic = "a".repeat(64);
+      await userEvent.keyboard(`${topic}{Enter}`);
+      expect(swarm.join).toHaveBeenCalledWith(topic);
+    });
+    it("should close form after submit and clear the form", async () => {
+      renderProjects();
+      await userEvent.click(screen.getByText("Join project"));
+      const topic = "a".repeat(64);
+      
+      await userEvent.type(screen.getByLabelText("Topic"), topic);
+      await userEvent.click(screen.getByText("Join topic"));
+      expect(screen.queryByText("Topic")).toBeNull();
+
+      await userEvent.click(screen.getByText("Join project"));
+      const input: HTMLInputElement = screen.getByLabelText("Topic");
+      expect(input.value).toBe("")
     });
   });
 });
