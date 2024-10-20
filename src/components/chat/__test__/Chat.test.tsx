@@ -33,19 +33,6 @@ describe("Chat", () => {
     expect(screen.queryByText("Start Chat")).toBeTruthy();
   });
 
-  it("should create topic after start chat", async () => {
-    for (const expectedTopic of ["topic-1", "topic-2"]) {
-      await test(expectedTopic);
-    }
-
-    async function test(expectedTopic: string) {
-      await renderChat({ createTopic: () => expectedTopic });
-      await clickStartChat();
-      await screen.findByText(expectedTopic);
-      cleanup();
-    }
-  });
-
   it("should hide start chat and join chat buttons after click", async () => {
     await renderChat();
     await clickStartChat();
@@ -127,15 +114,6 @@ describe("Chat", () => {
     expect(screen.queryByText("invalid topic")).toBeNull();
     await userEvent.keyboard(`${"z".repeat(64)}{Enter}`);
     screen.getByText("invalid topic");
-  });
-
-  it("should set topic if user provided a valid one", async () => {
-    await renderChat();
-    await clickJoinChat();
-    const topic = "f".repeat(64);
-    await userEvent.keyboard(`${topic}{Enter}`);
-    expect(screen.queryByText("invalid topic")).toBeNull();
-    screen.getByText(topic);
   });
 
   it("should join the topic in Join Chat flow", async () => {

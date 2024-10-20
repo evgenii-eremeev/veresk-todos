@@ -3,7 +3,7 @@ import { useProjects } from "../../model/ProjectsModel";
 import clsx from "clsx";
 
 export function ProjectTabs() {
-  const { projects, currentProject, setCurrentProject } = useProjects();
+  const { projects, currentProject, setCurrentProjectId } = useProjects();
   return (
     <ul role="tablist" className="m-3">
       {projects.map((project, index) => (
@@ -12,7 +12,7 @@ export function ProjectTabs() {
           className={clsx("cursor-pointer", {
             "font-bold": project.id == currentProject?.id,
           })}
-          onClick={() => setCurrentProject(project)}
+          onClick={() => setCurrentProjectId(project.id)}
           key={project.name + index}
         >
           {project.name}

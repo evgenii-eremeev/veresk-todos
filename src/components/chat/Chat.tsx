@@ -21,10 +21,6 @@ export function Chat({ onTopicCreated, savedTopic }: Props) {
     messages,
   } = useSwarm();
 
-  useEffect(() => {
-    setTopic(null)
-  }, [savedTopic])
-
   return (
     <div className="border-2 border-gray-600 h-64 mr-2 my-2 p-2">
       {(!topic)? (
@@ -40,7 +36,6 @@ export function Chat({ onTopicCreated, savedTopic }: Props) {
         />
       ) : (
         <>
-          <p>{topic}</p>
           <p>Peers: {peerCount}</p>
           <Messages messages={messages} />
           <MessageEditor onSubmit={sendAll} />

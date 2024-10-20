@@ -36,7 +36,7 @@ export interface ProjectsModel {
   projects: Array<Project>;
   currentProject: Project | null;
   addNewProject: (name: string) => void;
-  setCurrentProject: (project: Project | null) => void;
+  setCurrentProjectId: (projectId: string | null) => void;
   removeProject: (projectId: string) => void;
   setProjectTopic: (projectId: string, topic: string) => void;
 }
@@ -45,14 +45,16 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
   const [tasks, setTasks] = useState<Array<Task>>([]);
 
   const [projects, setProjects] = useState<Array<Project>>([]);
-  const [currentProject, setCurrentProject] = useState<Project | null>(null);
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>("");
+  const currentProject =
+    projects.find((propject) => propject.id === currentProjectId) ?? null;
 
   const { setProjectsPersist, setTasksPersist } = usePersistance({
     persist,
     setProjects,
     setTasks,
     onStateLoaded({ projects }) {
-      setCurrentProject(projects[0] ?? null);
+      setCurrentProjectId(projects[0]?.id ?? null);
     },
   });
 
@@ -93,7 +95,7 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
   function addNewProject(projectName: string) {
     const project = createNewProject(projectName);
     addProject(project);
-    setCurrentProject(project);
+    setCurrentProjectId(project.id);
   }
 
   function addProject(project: Project) {
@@ -130,7 +132,7 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
     projects,
     currentProject,
     addNewProject,
-    setCurrentProject,
+    setCurrentProjectId,
     removeProject,
     setProjectTopic,
   };

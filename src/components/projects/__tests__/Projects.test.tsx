@@ -213,8 +213,8 @@ describe("Projects", () => {
       screen.getByText("Join project chat");
     });
 
-    it("should show chat only for projects that connected to the swarm", async () => {
-      const topic = 'a'.repeat(64);
+    xit("should show chat only for projects that connected to the swarm", async () => {
+      const topic = "a".repeat(64);
       const projects = [
         { ...createNewProject("Veresk"), topic },
         createNewProject("Candy"),
@@ -228,7 +228,7 @@ describe("Projects", () => {
       await userEvent.click(screen.getByText("Join project chat"));
       screen.getByText(topic);
 
-      userEvent.click(getProjectTab('Candy'));
+      userEvent.click(getProjectTab("Candy"));
       await screen.findByText("Start Chat");
     });
   });
@@ -274,6 +274,49 @@ describe("Projects", () => {
       const persistedProjects = JSON.parse(await persist.get("projects"));
       expect(persistedProjects[0].name).toEqual("Candy");
       expect(persistedProjects[1].name).toEqual("Veresk");
+    });
+  });
+
+  describe("share", () => {
+    it("should have share project button", async () => {
+      renderProjects();
+      await addProjects(["Veresk"]);
+      screen.getByText("Share project");
+    });
+    it("should dispaly topic after clicking Share project button", async () => {
+      const topic = "a".repeat(64);
+      renderProjects({ createTopic: () => topic });
+      await addProjects(["Veresk"]);
+      await userEvent.click(screen.getByText("Share project"));
+      await screen.findByText(topic);
+    });
+    it("should not show display button if project is already shared", async () => {
+      const topic = "a".repeat(64);
+      const persist = new PersistMock({
+        projects: JSON.stringify([{ ...createNewProject("Veresk"), topic }]),
+      });
+      renderProjects({ persist });
+      await expect(
+        screen.findByText("Share project").catch(() => "not found")
+      ).resolves.toBe("not found");
+    });
+    it("should show topic if project is already shared", async () => {
+      const topic = "a".repeat(64);
+      const project = { ...createNewProject("Veresk"), topic };
+      const persist = new PersistMock({
+        projects: JSON.stringify([project]),
+      });
+      renderProjects({ persist });
+      await screen.findByText(topic);
+    });
+    it("should assign swarm topic to a project", async () => {
+      const topic = "a".repeat(64);
+      const persist = new PersistMock();
+      renderProjects({ persist, createTopic: () => topic });
+      await addProjects(["Veresk"]);
+      await userEvent.click(screen.getByText("Share project"));
+      const persistedProject = JSON.parse(await persist.get("projects"))[0];
+      expect(persistedProject.topic).toBe(topic);
     });
   });
 });

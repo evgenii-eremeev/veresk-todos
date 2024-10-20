@@ -5,10 +5,17 @@ import { TaskCreator } from "./TaskCreator";
 import { TasksTitle } from "./TasksTitle";
 import { Button } from "../common/Button";
 import { Chat } from "../chat/Chat";
+import { useSwarm } from "../../model/SwarmModel";
 
 export function Tasks() {
-  const { currentProject, setCurrentProject, removeProject, setProjectTopic } =
-    useProjects();
+  const {
+    currentProject,
+    setCurrentProjectId,
+    removeProject,
+    setProjectTopic,
+  } = useProjects();
+
+  const { joinTopic, createTopic } = useSwarm();
   return (
     currentProject && (
       <>
@@ -19,11 +26,25 @@ export function Tasks() {
           className="text-sm"
           onClick={() => {
             removeProject(currentProject.id);
-            setCurrentProject(null);
+            setCurrentProjectId(null);
           }}
         >
           Delete project
         </Button>
+        {!currentProject.topic ? (
+          <Button
+            onClick={async () => {
+              const topic = createTopic();
+              await joinTopic(topic);
+              setProjectTopic(currentProject.id, topic);
+            }}
+          >
+            Share project
+          </Button>
+        ) : (
+          <p>{currentProject.topic}</p>
+        )}
+
         <Chat
           onTopicCreated={(topic) => setProjectTopic(currentProject.id, topic)}
           savedTopic={currentProject.topic}
