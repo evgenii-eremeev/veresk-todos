@@ -10,10 +10,17 @@ import { SwarmMock } from "../../../utils/testing";
 function renderChat({
   swarm = new SwarmMock(),
   createTopic = originalCreateTopic,
-}: { swarm?: Swarm; createTopic?: () => string } = {}) {
+  onTopicCreated = () => {},
+  savedTopic = null,
+}: {
+  swarm?: Swarm;
+  createTopic?: () => string;
+  onTopicCreated?: (topic: string) => void;
+  savedTopic?: string | null;
+} = {}) {
   render(
     <SwarmModelProvider swarm={swarm} createTopic={createTopic}>
-      <Chat />
+      <Chat onTopicCreated={onTopicCreated} savedTopic={savedTopic} />
     </SwarmModelProvider>
   );
 }
@@ -167,6 +174,36 @@ describe("Chat", () => {
       await screen.findByText(`Peers: ${i + 1}`);
     }
   });
+
+  it("should call onConnected prop after getting swarm connection", async () => {
+    const onTopicCreated = jest.fn();
+    const topic = "a".repeat(64);
+    renderChat({ onTopicCreated, createTopic: () => topic });
+    await clickStartChat();
+    expect(onTopicCreated).toHaveBeenCalledWith(topic);
+  });
+
+  it("should not render 'Join project chat' button if savedTopic is null", async () => {
+    renderChat({ savedTopic: null });
+    expect(screen.queryByText("Join project chat")).toBeNull();
+  });
+
+  it("should render only Join existing topic if topic was passed via props", async () => {
+    const savedTopic = "a".repeat(64);
+    renderChat({ savedTopic });
+    screen.getByText("Join project chat");
+    expect(screen.queryByText("Start Chat")).toBe(null);
+    expect(screen.queryByText("Join Chat")).toBe(null);
+  });
+
+  it("should join existing topic after 'Join project chat' clicked", async () => {
+    const swarm = new SwarmMock();
+    const savedTopic = "topic";
+    renderChat({ swarm, savedTopic });
+    await clickJoinProjectChat();
+
+    expect(swarm.join).toHaveBeenCalledWith(savedTopic);
+  });
 });
 
 async function clickStartChat() {
@@ -177,3 +214,6 @@ async function clickJoinChat() {
   return userEvent.click(screen.getByText("Join Chat"));
 }
 
+async function clickJoinProjectChat() {
+  return userEvent.click(screen.getByText("Join project chat"));
+}

@@ -10,19 +10,6 @@ import { Project } from "../types/project-types";
 import { randomStringOfNumbers } from "../utils/random";
 import { Persist } from "../types/persist-types";
 
-export interface ProjectsModel {
-  tasks: Array<Task>;
-  addTask: (projectId: string, text: string) => void;
-  editTask: (taskId: string, text: string) => void;
-  removeTask: (taskId: string) => void;
-  toggleTaskCompleted: (taskId: string) => void;
-  projects: Array<Project>;
-  currentProject: Project | null;
-  addNewProject: (name: string) => void;
-  setCurrentProject: (project: Project | null) => void;
-  removeProject: (projectId: string) => void;
-}
-
 export function useProjects(): ProjectsModel {
   const model = useContext(ProjectsModelContext);
   if (!model) {
@@ -40,6 +27,20 @@ export function ProjectsModelProvider({
 
 const ProjectsModelContext = createContext<ProjectsModel | null>(null);
 
+export interface ProjectsModel {
+  tasks: Array<Task>;
+  addTask: (projectId: string, text: string) => void;
+  editTask: (taskId: string, text: string) => void;
+  removeTask: (taskId: string) => void;
+  toggleTaskCompleted: (taskId: string) => void;
+  projects: Array<Project>;
+  currentProject: Project | null;
+  addNewProject: (name: string) => void;
+  setCurrentProject: (project: Project | null) => void;
+  removeProject: (projectId: string) => void;
+  setProjectTopic: (projectId: string, topic: string) => void;
+}
+
 function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
   const [tasks, setTasks] = useState<Array<Task>>([]);
 
@@ -54,19 +55,6 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
       setCurrentProject(projects[0] ?? null);
     },
   });
-
-  return {
-    tasks: tasks.filter((task) => task.projectId == currentProject?.id),
-    addTask,
-    editTask,
-    removeTask,
-    toggleTaskCompleted,
-    projects,
-    currentProject,
-    addNewProject,
-    setCurrentProject,
-    removeProject,
-  };
 
   function addTask(projectId: string, text: string) {
     setTasksPersist((tasks) => [...tasks, createNewTask(text, projectId)]);
@@ -117,6 +105,35 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
       projects.filter((project) => project.id != projectId)
     );
   }
+
+  function updateProject(
+    projectId: string,
+    updater: (project: Project) => Partial<Project>
+  ) {
+    setProjectsPersist((projects) =>
+      projects.map((project) =>
+        project.id == projectId ? { ...project, ...updater(project) } : project
+      )
+    );
+  }
+
+  function setProjectTopic(projectId: string, topic: string) {
+    updateProject(projectId, () => ({ topic }));
+  }
+
+  return {
+    tasks: tasks.filter((task) => task.projectId == currentProject?.id),
+    addTask,
+    editTask,
+    removeTask,
+    toggleTaskCompleted,
+    projects,
+    currentProject,
+    addNewProject,
+    setCurrentProject,
+    removeProject,
+    setProjectTopic,
+  };
 }
 
 function usePersistance({
@@ -175,5 +192,6 @@ export function createNewProject(name: string): Project {
   return {
     name,
     id: randomStringOfNumbers(),
+    topic: null,
   };
 }

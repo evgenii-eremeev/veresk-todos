@@ -4,7 +4,12 @@ import { Button } from "../common/Button";
 import { useSwarm } from "../../model/SwarmModel";
 import { Message } from "../../types/communication-types";
 
-export function Chat() {
+interface Props {
+  onTopicCreated: (topic: string) => void;
+  savedTopic: string | null;
+}
+
+export function Chat({ onTopicCreated, savedTopic }: Props) {
   const {
     topic,
     peerCount,
@@ -12,16 +17,21 @@ export function Chat() {
     joinTopic,
     isJoining,
     sendAll,
-    messages
+    messages,
   } = useSwarm();
 
   return (
     <div className="border-2 border-gray-600 h-64 mr-2 my-2 p-2">
       {!topic ? (
         <StartPanel
-          onTopic={joinTopic}
+          onTopic={async (topic) => {
+            await joinTopic(topic);
+            onTopicCreated(topic);
+          }}
           createTopic={createTopic}
           isJoining={isJoining}
+          savedTopic={savedTopic}
+          onJoinSavedTopic={joinTopic}
         />
       ) : (
         <>
@@ -39,37 +49,47 @@ function StartPanel({
   onTopic,
   createTopic,
   isJoining,
+  savedTopic,
+  onJoinSavedTopic,
 }: {
   onTopic: (topic: string) => void;
   createTopic: () => string;
   isJoining: boolean;
+  savedTopic: string | null;
+  onJoinSavedTopic: (topic: string) => void;
 }) {
   const [showTopicForm, setShowTopicForm] = useState(false);
 
   return (
     <div>
-      <Button
-        className="mx-2 disabled:border-gray-500 disabled:text-gray-500"
-        onClick={async () => {
-          onTopic(createTopic());
-        }}
-        disabled={isJoining}
-      >
-        Start Chat
-      </Button>
-      <Button
-        className="disabled:border-gray-500 disabled:text-gray-500"
-        onClick={() => setShowTopicForm(true)}
-        disabled={isJoining}
-      >
-        Join Chat
-      </Button>
-      {showTopicForm && <TopicEditor onSubmit={onTopic} />}
+      {savedTopic ? (
+        <Button onClick={() => onJoinSavedTopic(savedTopic)}>Join project chat</Button>
+      ) : (
+        <>
+          <Button
+            className="mx-2 disabled:border-gray-500 disabled:text-gray-500"
+            onClick={async () => {
+              onTopic(createTopic());
+            }}
+            disabled={isJoining}
+          >
+            Start Chat
+          </Button>
+          <Button
+            className="disabled:border-gray-500 disabled:text-gray-500"
+            onClick={() => setShowTopicForm(true)}
+            disabled={isJoining}
+          >
+            Join Chat
+          </Button>
+          {showTopicForm && <TopicEditor onSubmit={onTopic} />}
+        </>
+      )}
     </div>
   );
 }
 
-function Messages({messages}: {messages: Message[]}) {
+function Messages({ messages }: { messages: Message[] }) {
   return (
     <div className="h-40 overflow-y-auto text-wrap">
       {messages.map((message, idx) => (

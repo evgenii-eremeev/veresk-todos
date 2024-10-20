@@ -25,7 +25,6 @@ export function Projects({ persist, swarm, createTopic }: Props) {
           </div>
           <div className="col-span-9">
             <Tasks />
-            <Chat />
           </div>
         </div>
       </SwarmModelProvider>

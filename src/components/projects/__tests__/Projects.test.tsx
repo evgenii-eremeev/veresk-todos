@@ -11,9 +11,16 @@ import {
 } from "../../../utils/testing";
 import { createNewProject, createNewTask } from "../../../model/ProjectsModel";
 import { Persist } from "../../../types/persist-types";
-import { createTopic } from "../../../backend/swarm";
+import { createTopic as originalCreateTopic } from "../../../backend/swarm";
+import { CreateTopic } from "../../../model/SwarmModel";
 
-function renderProjects(persist: Persist = new PersistMock()) {
+function renderProjects({
+  persist = new PersistMock(),
+  createTopic = originalCreateTopic,
+}: {
+  persist?: Persist;
+  createTopic?: CreateTopic;
+} = {}) {
   render(
     <Projects
       persist={persist}
@@ -176,6 +183,37 @@ describe("Projects", () => {
     expect(screen.queryAllByText("Veresk")).toHaveLength(0);
   });
 
+  describe("init chat", () => {
+    it("should init swarm topic as null in project", async () => {
+      const persist = new PersistMock();
+      renderProjects({ persist });
+      await addProjects(["Veresk"]);
+      const persistedProject = JSON.parse(await persist.get("projects"))[0];
+      expect(persistedProject.topic).toBeNull();
+    });
+
+    it("should assign swarm topic to a project", async () => {
+      const topic = "topic";
+      const persist = new PersistMock();
+      renderProjects({ persist, createTopic: () => topic });
+      await addProjects(["Veresk"]);
+      await userEvent.click(screen.getByText("Start Chat"));
+      const persistedProject = JSON.parse(await persist.get("projects"))[0];
+      expect(persistedProject.topic).toBe(topic);
+    });
+
+    it("should have 'Join project chat' button is project have savedTopic", async () => {
+      const project = { ...createNewProject("Veresk"), topic: "topic" };
+      const persist = new PersistMock({
+        projects: JSON.stringify([project]),
+      });
+      renderProjects({ persist });
+
+      await findProjectTab("Veresk");
+      screen.getByText("Join project chat");
+    });
+  });
+
   describe("persistance", () => {
     it("should init state from the persistence store", async () => {
       const project = createNewProject("Veresk");
@@ -186,7 +224,7 @@ describe("Projects", () => {
           createNewTask("task 2", project.id),
         ]),
       });
-      renderProjects(persist);
+      renderProjects({ persist });
 
       expect(await findProjectTab("Veresk")).not.toBeNull();
       expect(await screen.findByText("task 1")).not.toBeNull();
@@ -195,7 +233,7 @@ describe("Projects", () => {
 
     it("should save state in the persistance state", async () => {
       const persist = new PersistMock();
-      renderProjects(persist);
+      renderProjects({ persist });
       await addProjects(["Veresk"]);
       await addTasks(["task 1"]);
 
@@ -212,7 +250,7 @@ describe("Projects", () => {
       const persist = new PersistMock({
         projects: JSON.stringify([createNewProject("Veresk")]),
       });
-      renderProjects(persist);
+      renderProjects({ persist });
       await addProjects(["Candy"]);
       const persistedProjects = JSON.parse(await persist.get("projects"));
       expect(persistedProjects[0].name).toEqual("Candy");
