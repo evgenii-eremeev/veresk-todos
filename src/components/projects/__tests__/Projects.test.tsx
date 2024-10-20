@@ -212,6 +212,25 @@ describe("Projects", () => {
       await findProjectTab("Veresk");
       screen.getByText("Join project chat");
     });
+
+    it("should show chat only for projects that connected to the swarm", async () => {
+      const topic = 'a'.repeat(64);
+      const projects = [
+        { ...createNewProject("Veresk"), topic },
+        createNewProject("Candy"),
+      ];
+      const persist = new PersistMock({
+        projects: JSON.stringify(projects),
+      });
+      renderProjects({ persist });
+
+      await findProjectTab("Veresk");
+      await userEvent.click(screen.getByText("Join project chat"));
+      screen.getByText(topic);
+
+      userEvent.click(getProjectTab('Candy'));
+      await screen.findByText("Start Chat");
+    });
   });
 
   describe("persistance", () => {

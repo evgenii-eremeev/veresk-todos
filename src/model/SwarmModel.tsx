@@ -30,6 +30,7 @@ export type CreateTopic = () => string;
 export interface SwarmModel {
   createTopic: CreateTopic;
   topic: string | null;
+  setTopic: (topic: string | null) => void;
   peerCount: number;
   messages: Array<Message>;
   joinTopic: (topic: string) => Promise<void>;
@@ -77,11 +78,12 @@ function useSwarmModel({
 
   return {
     topic,
+    setTopic,
     createTopic,
     peerCount,
     messages,
     joinTopic,
     isJoining,
-    sendAll
+    sendAll,
   };
 }

@@ -1,33 +1,35 @@
 import { render, screen, cleanup, act } from "@testing-library/react";
 import React from "react";
 import userEvent from "@testing-library/user-event";
-import { Chat } from "../Chat";
 import { Peer, Swarm } from "../../../types/swarm-types";
 import { createTopic as originalCreateTopic } from "../../../backend/swarm";
-import { SwarmModelProvider } from "../../../model/SwarmModel";
-import { SwarmMock } from "../../../utils/testing";
+import { CreateTopic, SwarmModelProvider } from "../../../model/SwarmModel";
+import { addProjects, PersistMock, SwarmMock } from "../../../utils/testing";
+import { Projects } from "../../projects/Projects";
+import { Persist } from "../../../types/persist-types";
 
-function renderChat({
-  swarm = new SwarmMock(),
+async function renderChat({
+  persist = new PersistMock(),
   createTopic = originalCreateTopic,
-  onTopicCreated = () => {},
-  savedTopic = null,
+  swarm = new SwarmMock()
 }: {
-  swarm?: Swarm;
-  createTopic?: () => string;
-  onTopicCreated?: (topic: string) => void;
-  savedTopic?: string | null;
+  persist?: Persist;
+  createTopic?: CreateTopic;
+  swarm?: Swarm
 } = {}) {
   render(
-    <SwarmModelProvider swarm={swarm} createTopic={createTopic}>
-      <Chat onTopicCreated={onTopicCreated} savedTopic={savedTopic} />
-    </SwarmModelProvider>
+    <Projects
+      persist={persist}
+      swarm={swarm}
+      createTopic={createTopic}
+    />
   );
+  await addProjects(["Test chat project"]);
 }
 
 describe("Chat", () => {
   it("should have start chat button", async () => {
-    renderChat();
+    await renderChat();
     expect(screen.queryByText("Start Chat")).toBeTruthy();
   });
 
@@ -37,7 +39,7 @@ describe("Chat", () => {
     }
 
     async function test(expectedTopic: string) {
-      renderChat({ createTopic: () => expectedTopic });
+      await renderChat({ createTopic: () => expectedTopic });
       await clickStartChat();
       await screen.findByText(expectedTopic);
       cleanup();
@@ -45,7 +47,7 @@ describe("Chat", () => {
   });
 
   it("should hide start chat and join chat buttons after click", async () => {
-    renderChat();
+    await renderChat();
     await clickStartChat();
     expect(screen.queryByText("Start Chat")).toBeNull();
     expect(screen.queryByText("Join Chat")).toBeNull();
@@ -54,26 +56,26 @@ describe("Chat", () => {
   it("should join new chat after start chat clicked", async () => {
     const swarm = new SwarmMock();
     const topic = "topic";
-    renderChat({ swarm, createTopic: () => topic });
+    await renderChat({ swarm, createTopic: () => topic });
     await clickStartChat();
 
     expect(swarm.join).toHaveBeenCalledWith(topic);
   });
 
   it("should render join chat button", async () => {
-    renderChat();
+    await renderChat();
     expect(screen.queryByText("Join Chat")).toBeTruthy();
   });
 
   it("should render chat message input after joining the swarm", async () => {
-    renderChat();
+    await renderChat();
     await clickStartChat();
     screen.getByLabelText("Message");
   });
 
   it("should call sendAll after submitting the message", async () => {
     const swarm = new SwarmMock();
-    renderChat({ swarm });
+    await renderChat({ swarm });
     expect(screen.queryByLabelText("Message")).toBeNull();
     await clickStartChat();
     await userEvent.click(screen.getByLabelText("Message"));
@@ -82,7 +84,7 @@ describe("Chat", () => {
   });
 
   it("should clear message input after send", async () => {
-    renderChat();
+    await renderChat();
     await clickStartChat();
     const input: HTMLInputElement = screen.getByLabelText("Message");
     await userEvent.click(input);
@@ -92,7 +94,7 @@ describe("Chat", () => {
   });
 
   it("should display message after sending it", async () => {
-    renderChat();
+    await renderChat();
     await clickStartChat();
     await userEvent.click(screen.getByLabelText("Message"));
     const messages = ["foo", "bar", "baz"];
@@ -104,7 +106,7 @@ describe("Chat", () => {
 
   it("should display message after receiving it", async () => {
     const swarm = new SwarmMock();
-    renderChat({ swarm });
+    await renderChat({ swarm });
     await clickStartChat();
     act(() => {
       swarm.simulatePeerData({ pubKey: "abcdef" }, "received message 1");
@@ -113,14 +115,14 @@ describe("Chat", () => {
   });
 
   it("should show input after Join Chat click", async () => {
-    renderChat();
+    await renderChat();
     expect(screen.queryByLabelText("Topic")).toBeNull();
     await clickJoinChat();
     expect(screen.queryByLabelText("Topic")).not.toBeNull();
   });
 
   it("should validate topic", async () => {
-    renderChat();
+    await renderChat();
     await clickJoinChat();
     expect(screen.queryByText("invalid topic")).toBeNull();
     await userEvent.keyboard(`${"z".repeat(64)}{Enter}`);
@@ -128,7 +130,7 @@ describe("Chat", () => {
   });
 
   it("should set topic if user provided a valid one", async () => {
-    renderChat();
+    await renderChat();
     await clickJoinChat();
     const topic = "f".repeat(64);
     await userEvent.keyboard(`${topic}{Enter}`);
@@ -138,7 +140,7 @@ describe("Chat", () => {
 
   it("should join the topic in Join Chat flow", async () => {
     const swarm = new SwarmMock();
-    renderChat({ swarm });
+    await renderChat({ swarm });
     await clickJoinChat();
     const topic = "f".repeat(64);
     await userEvent.keyboard(`${topic}{Enter}`);
@@ -147,7 +149,7 @@ describe("Chat", () => {
 
   it("should join by clicking Join button in Join Chat flow", async () => {
     const swarm = new SwarmMock();
-    renderChat({ swarm });
+    await renderChat({ swarm });
     await clickJoinChat();
     const topic = "f".repeat(64);
     await userEvent.type(screen.getByLabelText("Topic"), topic);
@@ -156,14 +158,14 @@ describe("Chat", () => {
   });
 
   it("should show peers count 0 after creating chat", async () => {
-    renderChat();
+    await renderChat();
     await clickStartChat();
     await screen.findByText("Peers: 0");
   });
 
   it("should show right peers count after someone joins", async () => {
     const swarm = new SwarmMock();
-    renderChat({ swarm });
+    await renderChat({ swarm });
     await clickStartChat();
 
     const peers = [{}, {}, {}] as Array<Peer>;
@@ -174,36 +176,8 @@ describe("Chat", () => {
       await screen.findByText(`Peers: ${i + 1}`);
     }
   });
+  
 
-  it("should call onConnected prop after getting swarm connection", async () => {
-    const onTopicCreated = jest.fn();
-    const topic = "a".repeat(64);
-    renderChat({ onTopicCreated, createTopic: () => topic });
-    await clickStartChat();
-    expect(onTopicCreated).toHaveBeenCalledWith(topic);
-  });
-
-  it("should not render 'Join project chat' button if savedTopic is null", async () => {
-    renderChat({ savedTopic: null });
-    expect(screen.queryByText("Join project chat")).toBeNull();
-  });
-
-  it("should render only Join existing topic if topic was passed via props", async () => {
-    const savedTopic = "a".repeat(64);
-    renderChat({ savedTopic });
-    screen.getByText("Join project chat");
-    expect(screen.queryByText("Start Chat")).toBe(null);
-    expect(screen.queryByText("Join Chat")).toBe(null);
-  });
-
-  it("should join existing topic after 'Join project chat' clicked", async () => {
-    const swarm = new SwarmMock();
-    const savedTopic = "topic";
-    renderChat({ swarm, savedTopic });
-    await clickJoinProjectChat();
-
-    expect(swarm.join).toHaveBeenCalledWith(savedTopic);
-  });
 });
 
 async function clickStartChat() {
