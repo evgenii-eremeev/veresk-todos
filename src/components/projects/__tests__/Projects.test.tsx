@@ -213,7 +213,7 @@ describe("Projects", () => {
       screen.getByText("Join project chat");
     });
 
-    xit("should show chat only for projects that connected to the swarm", async () => {
+    it("should show chat only for projects that connected to the swarm", async () => {
       const topic = "a".repeat(64);
       const projects = [
         { ...createNewProject("Veresk"), topic },

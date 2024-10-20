@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { isValidTopic } from "../../backend/swarm";
 import { Button } from "../common/Button";
 import { useSwarm } from "../../model/SwarmModel";
@@ -12,7 +12,6 @@ interface Props {
 export function Chat({ onTopicCreated, savedTopic }: Props) {
   const {
     topic,
-    setTopic,
     peerCount,
     createTopic,
     joinTopic,
@@ -20,10 +19,11 @@ export function Chat({ onTopicCreated, savedTopic }: Props) {
     sendAll,
     messages,
   } = useSwarm();
+  const hasJoined = topic && topic == savedTopic;
 
   return (
     <div className="border-2 border-gray-600 h-64 mr-2 my-2 p-2">
-      {(!topic)? (
+      {!hasJoined ? (
         <StartPanel
           onTopic={async (topic) => {
             await joinTopic(topic);
