@@ -13,7 +13,7 @@ import { createNewProject, createNewTask } from "../../../model/ProjectsModel";
 import { Persist } from "../../../types/persist-types";
 import { createTopic as originalCreateTopic } from "../../../backend/swarm";
 import { CreateTopic } from "../../../model/SwarmModel";
-import { Swarm } from "../../../types/swarm-types";
+import { Peer, Swarm } from "../../../types/swarm-types";
 
 function renderProjects({
   persist = new PersistMock(),
@@ -341,14 +341,25 @@ describe("Projects", () => {
       renderProjects();
       await userEvent.click(screen.getByText("Join project"));
       const topic = "a".repeat(64);
-      
+
       await userEvent.type(screen.getByLabelText("Topic"), topic);
       await userEvent.click(screen.getByText("Join topic"));
       expect(screen.queryByText("Topic")).toBeNull();
 
       await userEvent.click(screen.getByText("Join project"));
       const input: HTMLInputElement = screen.getByLabelText("Topic");
-      expect(input.value).toBe("")
+      expect(input.value).toBe("");
+    });
+  });
+  describe("send project", () => {
+    it("should send project to a connected peer", async () => {
+      const swarm = new SwarmMock();
+      renderProjects({ swarm });
+      await addProjects(["Veresk"]);
+      await userEvent.click(screen.getByText("Share project"));
+      const peer = { pubKey: "abc" };
+      swarm.simulatePeerConnection(peer);
+      expect(swarm.sendAll).toHaveBeenCalled();
     });
   });
 });

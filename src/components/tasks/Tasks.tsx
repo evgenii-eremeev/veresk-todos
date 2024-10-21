@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { TaskList } from "./TaskList";
 import { useProjects } from "../../model/ProjectsModel";
 import { TaskCreator } from "./TaskCreator";
@@ -6,6 +6,9 @@ import { TasksTitle } from "./TasksTitle";
 import { Button } from "../common/Button";
 import { Chat } from "../chat/Chat";
 import { useSwarm } from "../../model/SwarmModel";
+import { useSwarmEffect } from "../../model/useSwarmEffect";
+
+
 
 export function Tasks() {
   const {
@@ -15,7 +18,10 @@ export function Tasks() {
     setProjectTopic,
   } = useProjects();
 
-  const { joinTopic, createTopic } = useSwarm();
+  const { joinTopic, createTopic, sendAll } = useSwarm();
+  useSwarmEffect({onPeerConnected: () => sendAll('data')});
+  
+
   return (
     currentProject && (
       <>

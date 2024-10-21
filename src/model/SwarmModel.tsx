@@ -36,6 +36,9 @@ export interface SwarmModel {
   joinTopic: (topic: string) => Promise<void>;
   isJoining: boolean;
   sendAll: (text: string) => void;
+  addMessage: (text: string, from: string) => void;
+  setPeerCount: (count: number) => void;
+  swarm: SwarmI;
 }
 
 function useSwarmModel({
@@ -50,15 +53,6 @@ function useSwarmModel({
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [isJoining, setIsJoining] = useState(false);
 
-  useEffect(() => {
-    swarm.onConnectionsUpdate((connections) => {
-      setPeerCount(connections.size);
-    });
-
-    swarm.onPeerData((peer, data) => {
-      addMessage(data, peer.pubKey.slice(0, 4));
-    });
-  }, []);
 
   function addMessage(text: string, from: string) {
     setMessages((messages) => [...messages, { text, from }]);
@@ -72,7 +66,6 @@ function useSwarmModel({
   }
 
   function sendAll(text: string) {
-    addMessage(text, "me");
     swarm.sendAll(text);
   }
 
@@ -85,5 +78,8 @@ function useSwarmModel({
     joinTopic,
     isJoining,
     sendAll,
+    addMessage,
+    setPeerCount,
+    swarm,
   };
 }

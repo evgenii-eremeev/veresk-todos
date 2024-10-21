@@ -13,11 +13,15 @@ export class Swarm {
   }
 
   onPeerConnected(cb) {
+    this.onSwarmPeerConnected((swarmPeer) => cb(toPeer(swarmPeer)));
+  }
+
+  onSwarmPeerConnected(cb) {
     this.swarm.on("connection", cb);
   }
 
   onPeerData(cb) {
-    this.onPeerConnected((swarmPeer) => {
+    this.onSwarmPeerConnected((swarmPeer) => {
       swarmPeer.on("data", (data) =>
         cb(toPeer(swarmPeer), data.toString("utf8"))
       );
@@ -25,7 +29,7 @@ export class Swarm {
   }
 
   onPeerError(cb) {
-    this.onPeerConnected((swarmPeer) => {
+    this.onSwarmPeerConnected((swarmPeer) => {
       swarmPeer.on("error", (error) => cb(toPeer(swarmPeer), error));
     });
   }

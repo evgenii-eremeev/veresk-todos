@@ -43,16 +43,26 @@ describe("swarm", () => {
     expect(connectionsUpdateCallback).toHaveBeenNthCalledWith(2, connections);
   });
 
+  it("should call swarm peer connected event handler", () => {
+    const swarm = new Swarm({ Hyperswarm: HyperswarmMock, Pear });
+    const swarmPeerConnectedCallback = jest.fn();
+    swarm.onSwarmPeerConnected(swarmPeerConnectedCallback);
+    for (const pubKey of ['pubkey1', 'pubkey2']) {
+      const peer = new PeerMock(pubKey);
+      swarm.swarm.simulateEvent("connection", peer);
+      expect(swarmPeerConnectedCallback).toHaveBeenCalledWith(peer);
+    }
+  });
+
   it("should call peer connected event handler", () => {
     const swarm = new Swarm({ Hyperswarm: HyperswarmMock, Pear });
     const peerConnectedCallback = jest.fn();
     swarm.onPeerConnected(peerConnectedCallback);
-    const peer1 = new PeerMock("pubkey1");
-    const peer2 = new PeerMock("pubkey2");
-    swarm.swarm.simulateEvent("connection", peer1);
-    expect(peerConnectedCallback).toHaveBeenCalledWith(peer1);
-    swarm.swarm.simulateEvent("connection", peer2);
-    expect(peerConnectedCallback).toHaveBeenCalledWith(peer2);
+    for (const pubKey of ['pubkey1', 'pubkey2']) {
+      const peer = new PeerMock(pubKey);
+      swarm.swarm.simulateEvent("connection", peer);
+      expect(peerConnectedCallback).toHaveBeenCalledWith(peer.out());
+    }
   });
 
   it("should call peer data event handler", () => {

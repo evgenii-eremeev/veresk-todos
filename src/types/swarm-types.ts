@@ -3,6 +3,7 @@ export interface Swarm {
   sendAll: (message: string) => void;
   onConnectionsUpdate: (cb: (connections: Set<Peer>) => void) => void;
   onPeerData: (cb: (peer: Peer, data: string) => void) => void;
+  onPeerConnected: (cb: (peer: Peer) => void) => void;
 }
 
 export interface PeerHyperswarm {

@@ -18,6 +18,7 @@ export function Chat({ onTopicCreated, savedTopic }: Props) {
     isJoining,
     sendAll,
     messages,
+    addMessage
   } = useSwarm();
   const hasJoined = topic && topic == savedTopic;
 
@@ -38,7 +39,11 @@ export function Chat({ onTopicCreated, savedTopic }: Props) {
         <>
           <p>Peers: {peerCount}</p>
           <Messages messages={messages} />
-          <MessageEditor onSubmit={sendAll} />
+          <MessageEditor onSubmit={(message) => {
+            sendAll(message);
+            addMessage(message, 'me')
+          }} 
+          />
         </>
       )}
     </div>
