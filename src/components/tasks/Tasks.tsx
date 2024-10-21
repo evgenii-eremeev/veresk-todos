@@ -8,8 +8,6 @@ import { Chat } from "../chat/Chat";
 import { useSwarm } from "../../model/useSwarm";
 import { useSwarmEffect } from "../../model/useSwarmEffect";
 
-
-
 export function Tasks() {
   const {
     currentProject,
@@ -17,10 +15,15 @@ export function Tasks() {
     removeProject,
     setProjectTopic,
   } = useProjects();
-
-  const { joinTopic, createTopic, sendAll } = useSwarm();
-  useSwarmEffect({onPeerConnected: () => sendAll('data')});
-  
+  const { joinTopic, createTopic, send } = useSwarm();
+  useSwarmEffect({
+    onPeerConnected: (peer) => {
+      if (currentProject) {
+        send(peer.pubKey, { type: "share-project", payload: currentProject });
+      }
+    },
+    trackProps: [currentProject],
+  });
 
   return (
     currentProject && (

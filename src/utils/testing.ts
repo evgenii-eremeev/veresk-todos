@@ -48,6 +48,7 @@ export class SwarmMock implements Swarm {
 
   join = jest.fn().mockResolvedValue(undefined);
   sendAll = jest.fn();
+  send = jest.fn();
 
   onConnectionsUpdate(cb: (connections: Set<Peer>) => void) {
     this.eventCallbacks.connectionsUpdate = cb;

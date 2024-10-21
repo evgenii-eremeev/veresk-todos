@@ -43,11 +43,17 @@ export class Swarm {
     await discovery.flushed();
   }
 
-  sendAll(message) {
+  sendAll(message, predicate = () => true) {
     const data = b4a.from(message, "utf8");
     for (const peer of this.swarm.connections) {
-      peer.write(data);
+      if (predicate(peer)) {
+        peer.write(data);
+      }
     }
+  }
+
+  send(to, message) {
+    this.sendAll(message, (peer) => toPeer(peer).pubKey === to);
   }
 }
 

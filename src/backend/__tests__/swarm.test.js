@@ -113,7 +113,7 @@ describe("swarm", () => {
     });
     expect(swarm.swarm.flushed).toHaveBeenCalled();
   });
-  it("should send data", () => {
+  it("should send data to all", () => {
     const swarm = new Swarm({ Hyperswarm: HyperswarmMock, Pear });
     const peer1 = new PeerMock("pubkey1");
     const peer2 = new PeerMock("pubkey2");
@@ -124,6 +124,14 @@ describe("swarm", () => {
     expect(peer1.write).toHaveBeenCalledWith(buffer);
     expect(peer2.write).toHaveBeenCalledWith(buffer);
   });
+  it('should send data to one', () => {
+    const swarm = new Swarm({ Hyperswarm: HyperswarmMock, Pear });
+    const peer = new PeerMock("pubkey1");
+    swarm.swarm.simulateEvent("connection", peer);
+    const buffer = b4a.from("some data", "utf8");
+    swarm.send("pubkey1", "some data");
+    expect(peer.write).toHaveBeenCalledWith(buffer);
+  })
 });
 
 class HyperswarmMock {

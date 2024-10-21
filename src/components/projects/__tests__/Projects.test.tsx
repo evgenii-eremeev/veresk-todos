@@ -1,5 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
-import React from "react";
+import React, { act } from "react";
 import userEvent from "@testing-library/user-event";
 import { Projects } from "../Projects";
 import {
@@ -352,14 +352,32 @@ describe("Projects", () => {
     });
   });
   describe("send project", () => {
+    let id = 1;
+    beforeEach(() => {
+      jest.spyOn(global.Math, "random").mockReturnValue(id / 10);
+      id += 1;
+    });
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
     it("should send project to a connected peer", async () => {
       const swarm = new SwarmMock();
-      renderProjects({ swarm });
+      const topic = "topic";
+      renderProjects({ swarm, createTopic: () => topic });
       await addProjects(["Veresk"]);
       await userEvent.click(screen.getByText("Share project"));
       const peer = { pubKey: "abc" };
-      swarm.simulatePeerConnection(peer);
-      expect(swarm.sendAll).toHaveBeenCalled();
+      act(() => {
+        swarm.simulatePeerConnection(peer);
+      });
+      expect(swarm.send).toHaveBeenCalledWith(
+        peer.pubKey,
+        JSON.stringify({
+          type: "share-project",
+          payload: { ...createNewProject("Veresk"), topic },
+        })
+      );
     });
   });
 });
