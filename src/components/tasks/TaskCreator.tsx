@@ -40,12 +40,9 @@ export function TaskCreator({
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
       />
-      <Button
-        type="submit"
-        className="mx-2"
-      >
-        {editMode ? "Done" : "Add"}
-      </Button>
-    </form>
+        <Button type="submit" className="mx-2">
+          {editMode ? "Done" : "Add"}
+        </Button>
+      </form>
   );
 }

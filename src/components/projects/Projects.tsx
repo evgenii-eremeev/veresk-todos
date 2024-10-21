@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Tasks } from "../tasks/Tasks";
 import { ProjectsModelProvider } from "../../model/ProjectsModel";
 import { ProjectCreator } from "./ProjectCreator";
@@ -10,7 +10,7 @@ import {
   useSwarm,
 } from "../../model/SwarmModel";
 import { Swarm } from "../../types/swarm-types";
-import { Button } from "../common/Button";
+import { ModalLike } from "../common/ModalLike";
 
 interface Props {
   persist: Persist;
@@ -49,43 +49,3 @@ function ProjectJoiner() {
   );
 }
 
-interface ModalLikeProps {
-  mainLabel: string;
-  secondaryLabel: string;
-  inputLabel: string;
-  onSubmit: (topic: string) => void;
-}
-
-function ModalLike({ mainLabel, secondaryLabel, inputLabel, onSubmit }: ModalLikeProps) {
-  const [showInput, setShowInput] = useState(false);
-  const [draft, setDraft] = useState("");
-  return (
-    <>
-      {!showInput && (
-        <Button onClick={() => setShowInput(true)}>{mainLabel}</Button>
-      )}
-      {showInput && (
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            onSubmit(draft);
-            setShowInput(false);
-            setDraft("")
-          }}
-        >
-          <label className="hidden" htmlFor={`${mainLabel}-input`}>
-            {inputLabel}
-          </label>
-          <input
-            autoFocus
-            id={`${mainLabel}-input`}
-            onChange={(event) => {
-              setDraft(event.target.value);
-            }}
-          />
-          <Button type="submit">{secondaryLabel}</Button>
-        </form>
-      )}
-    </>
-  );
-}
