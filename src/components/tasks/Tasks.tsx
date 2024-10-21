@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { TaskList } from "./TaskList";
-import { useProjects } from "../../model/ProjectsModel";
+import { useProjects } from "../../model/useProjects";
 import { TaskCreator } from "./TaskCreator";
 import { TasksTitle } from "./TasksTitle";
 import { Button } from "../common/Button";
 import { Chat } from "../chat/Chat";
-import { useSwarm } from "../../model/SwarmModel";
+import { useSwarm } from "../../model/useSwarm";
 import { useSwarmEffect } from "../../model/useSwarmEffect";
 
 

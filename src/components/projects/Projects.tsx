@@ -1,6 +1,6 @@
 import React from "react";
 import { Tasks } from "../tasks/Tasks";
-import { ProjectsModelProvider } from "../../model/ProjectsModel";
+import { ProjectsModelProvider } from "../../model/useProjects";
 import { ProjectCreator } from "./ProjectCreator";
 import { ProjectTabs } from "./ProjectTabs";
 import { Persist } from "../../types/persist-types";
@@ -8,7 +8,7 @@ import {
   CreateTopic,
   SwarmModelProvider,
   useSwarm,
-} from "../../model/SwarmModel";
+} from "../../model/useSwarm";
 import { Swarm } from "../../types/swarm-types";
 import { ModalLike } from "../common/ModalLike";
 

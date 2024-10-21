@@ -1,5 +1,5 @@
 import React from "react";
-import { useProjects } from "../../model/ProjectsModel";
+import { useProjects } from "../../model/useProjects";
 import clsx from "clsx";
 
 export function ProjectTabs() {

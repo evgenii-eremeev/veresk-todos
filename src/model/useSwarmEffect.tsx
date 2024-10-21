@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useSwarm } from "./SwarmModel";
+import { useSwarm } from "./useSwarm";
 import { Peer } from "../types/swarm-types";
 
 interface Props {

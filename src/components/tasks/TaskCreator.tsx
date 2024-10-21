@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useProjects } from "../../model/ProjectsModel";
+import { useProjects } from "../../model/useProjects";
 import { Task } from "../../types/task-types";
 import { Button } from "../common/Button";
 

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { isValidTopic } from "../../backend/swarm";
 import { Button } from "../common/Button";
-import { useSwarm } from "../../model/SwarmModel";
+import { useSwarm } from "../../model/useSwarm";
 import { Message } from "../../types/communication-types";
 
 interface Props {

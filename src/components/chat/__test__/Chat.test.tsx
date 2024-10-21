@@ -3,7 +3,7 @@ import React from "react";
 import userEvent from "@testing-library/user-event";
 import { Peer, Swarm } from "../../../types/swarm-types";
 import { createTopic as originalCreateTopic } from "../../../backend/swarm";
-import { CreateTopic, SwarmModelProvider } from "../../../model/SwarmModel";
+import { CreateTopic, SwarmModelProvider } from "../../../model/useSwarm";
 import { addProjects, PersistMock, SwarmMock } from "../../../utils/testing";
 import { Projects } from "../../projects/Projects";
 import { Persist } from "../../../types/persist-types";

@@ -9,10 +9,10 @@ import {
   PersistMock,
   SwarmMock,
 } from "../../../utils/testing";
-import { createNewProject, createNewTask } from "../../../model/ProjectsModel";
+import { createNewProject, createNewTask } from "../../../model/useProjects";
 import { Persist } from "../../../types/persist-types";
 import { createTopic as originalCreateTopic } from "../../../backend/swarm";
-import { CreateTopic } from "../../../model/SwarmModel";
+import { CreateTopic } from "../../../model/useSwarm";
 import { Peer, Swarm } from "../../../types/swarm-types";
 
 function renderProjects({
