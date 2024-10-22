@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { TaskList } from "./TaskList";
 import { useProjects } from "../../model/useProjects";
 import { TaskCreator } from "./TaskCreator";
@@ -14,10 +14,12 @@ export function Tasks() {
     setCurrentProjectId,
     removeProject,
     setProjectTopic,
+    tasks
   } = useProjects();
-  const { joinTopic, createTopic, send } = useSwarm();
+  const { joinTopic, createTopic } = useSwarm();
   useSwarmEffect({
     currentProject,
+    tasks
   });
 
   return (

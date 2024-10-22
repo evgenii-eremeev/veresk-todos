@@ -352,20 +352,23 @@ describe("Projects", () => {
     });
   });
   describe("send project", () => {
-    let id = 1;
-    beforeEach(() => {
-      jest.spyOn(global.Math, "random").mockReturnValue(id / 10);
-      id += 1;
-    });
     afterEach(() => {
       jest.restoreAllMocks();
     });
 
-    it("should send project to a connected peer", async () => {
+    it("should send project and tasks to a connected peer", async () => {
       const swarm = new SwarmMock();
       const topic = "topic";
       renderProjects({ swarm, createTopic: () => topic });
+
+      jest.spyOn(global.Math, "random").mockReturnValue(0.1);
       await addProjects(["Veresk"]);
+      const project = { ...createNewProject("Veresk"), topic };
+
+      jest.spyOn(global.Math, "random").mockReturnValue(0.2);
+      await addTasks(["task 1"]);
+      const tasks = [createNewTask("task 1", "1")];
+
       await userEvent.click(screen.getByText("Share project"));
       const peer = { pubKey: "abc" };
       act(() => {
@@ -375,7 +378,10 @@ describe("Projects", () => {
         peer.pubKey,
         JSON.stringify({
           type: "share-project",
-          payload: { ...createNewProject("Veresk"), topic },
+          payload: {
+            project,
+            tasks,
+          },
         })
       );
       expect(swarm.send).toHaveBeenCalledTimes(1);
