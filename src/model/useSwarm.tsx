@@ -35,7 +35,7 @@ export interface SwarmModel {
   messages: Array<Message>;
   joinTopic: (topic: string) => Promise<void>;
   isJoining: boolean;
-  sendAll: (text: string) => void;
+  sendAll: (data: Object) => void;
   send: (to: string, data: Object) => void;
   addMessage: (text: string, from: string) => void;
   setPeerCount: (count: number) => void;
@@ -66,8 +66,8 @@ function useSwarmModel({
     setTopic(topic);
   }
 
-  function sendAll(text: string) {
-    swarm.sendAll(text);
+  function sendAll(data: Object) {
+    swarm.sendAll(JSON.stringify(data));
   }
 
   function send(to: string, data: Object) {

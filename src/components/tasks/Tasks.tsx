@@ -17,12 +17,7 @@ export function Tasks() {
   } = useProjects();
   const { joinTopic, createTopic, send } = useSwarm();
   useSwarmEffect({
-    onPeerConnected: (peer) => {
-      if (currentProject) {
-        send(peer.pubKey, { type: "share-project", payload: currentProject });
-      }
-    },
-    trackProps: [currentProject],
+    currentProject,
   });
 
   return (

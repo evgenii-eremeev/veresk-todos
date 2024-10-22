@@ -11,18 +11,14 @@ import { Persist } from "../../../types/persist-types";
 async function renderChat({
   persist = new PersistMock(),
   createTopic = originalCreateTopic,
-  swarm = new SwarmMock()
+  swarm = new SwarmMock(),
 }: {
   persist?: Persist;
   createTopic?: CreateTopic;
-  swarm?: Swarm
+  swarm?: Swarm;
 } = {}) {
   render(
-    <Projects
-      persist={persist}
-      swarm={swarm}
-      createTopic={createTopic}
-    />
+    <Projects persist={persist} swarm={swarm} createTopic={createTopic} />
   );
   await addProjects(["Test chat project"]);
 }
@@ -67,7 +63,9 @@ describe("Chat", () => {
     await clickStartChat();
     await userEvent.click(screen.getByLabelText("Message"));
     await userEvent.keyboard("msg{Enter}");
-    expect(swarm.sendAll).toHaveBeenCalledWith("msg");
+    expect(swarm.sendAll).toHaveBeenCalledWith(
+      JSON.stringify({ type: "chat-message", payload: "msg" })
+    );
   });
 
   it("should clear message input after send", async () => {
@@ -96,7 +94,10 @@ describe("Chat", () => {
     await renderChat({ swarm });
     await clickStartChat();
     act(() => {
-      swarm.simulatePeerData({ pubKey: "abcdef" }, "received message 1");
+      swarm.simulatePeerData(
+        { pubKey: "abcdef" },
+        JSON.stringify({ type: "chat-message", payload: "received message 1" })
+      );
     });
     screen.getByText("abcd: received message 1");
   });
@@ -154,8 +155,6 @@ describe("Chat", () => {
       await screen.findByText(`Peers: ${i + 1}`);
     }
   });
-  
-
 });
 
 async function clickStartChat() {
