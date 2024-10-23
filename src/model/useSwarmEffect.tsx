@@ -1,15 +1,12 @@
 import { useEffect } from "react";
 import { useSwarm } from "./useSwarm";
+import { useProjects } from "./useProjects";
 import { Project } from "../types/project-types";
 import { Task } from "../types/task-types";
 
-interface Props {
-  currentProject: Project | null;
-  tasks: Task[];
-}
-
-export function useSwarmEffect({ currentProject, tasks }: Props) {
+export function useSwarmEffect() {
   const { swarm, addMessage, setPeerCount, send, topic } = useSwarm();
+  const { currentProject, tasks, addSharedProject } = useProjects();
 
   useEffect(() => {
     swarm.onPeerConnected((peer) => {
@@ -28,11 +25,25 @@ export function useSwarmEffect({ currentProject, tasks }: Props) {
     });
 
     swarm.onPeerData((peer, data) => {
-      const parsedData = JSON.parse(data);
-      if (parsedData.type === "chat-message") {
-        addMessage(parsedData.payload, peer.pubKey.slice(0, 4));
-      } else {
-        console.log("message received", peer, data); // TODO display
+      const {
+        type,
+        payload,
+      }:
+        | { type: "chat-message"; payload: string }
+        | {
+            type: "share-project";
+            payload: { project: Project; tasks: Task[] };
+          } = JSON.parse(data);
+
+      switch (type) {
+        case "chat-message":
+          addMessage(payload, peer.pubKey.slice(0, 4));
+          break;
+        case "share-project":
+          addSharedProject(payload.project, payload.tasks);
+          break;
+        default:
+          console.error("unknown swarm message type");
       }
     });
   }, []);

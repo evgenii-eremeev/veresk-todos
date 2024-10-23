@@ -27,6 +27,7 @@ export function Projects({ persist, swarm, createTopic }: Props) {
             <ProjectCreator />
             <ProjectTabs />
             <ProjectJoiner />
+            <ProjectTabs shared />
           </div>
           <div className="col-span-9">
             <Tasks />

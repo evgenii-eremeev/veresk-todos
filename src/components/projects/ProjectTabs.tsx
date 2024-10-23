@@ -2,10 +2,21 @@ import React from "react";
 import { useProjects } from "../../model/useProjects";
 import clsx from "clsx";
 
-export function ProjectTabs() {
-  const { projects, currentProject, setCurrentProjectId } = useProjects();
+interface Props {
+  shared?: boolean;
+}
+
+export function ProjectTabs({ shared = false }: Props = {}) {
+  const {
+    projects: ownProjects,
+    sharedProjects,
+    currentProject,
+    setCurrentProjectId,
+  } = useProjects();
+  const projects = shared ? sharedProjects : ownProjects;
+  const testId = shared ? "shared-project-list" : "project-list";
   return (
-    <ul role="tablist" className="m-3">
+    <ul data-testid={testId} role="tablist" className="m-3">
       {projects.map((project, index) => (
         <li
           role="tab"

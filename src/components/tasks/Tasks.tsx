@@ -17,10 +17,7 @@ export function Tasks() {
     tasks
   } = useProjects();
   const { joinTopic, createTopic } = useSwarm();
-  useSwarmEffect({
-    currentProject,
-    tasks
-  });
+  useSwarmEffect();
 
   return (
     currentProject && (

@@ -32,7 +32,7 @@ function renderProjects({
 describe("Projects", () => {
   it("should not create a project with empty name", async () => {
     renderProjects();
-    const projects = await screen.findByRole("tablist");
+    const projects = await screen.findByTestId("project-list");
     await userEvent.click(screen.getByText("New project"));
     await userEvent.click(screen.getByText("Create"));
 
@@ -69,7 +69,7 @@ describe("Projects", () => {
 
   it("should add one project to the list of projects", async () => {
     renderProjects();
-    const projects = screen.getByRole("tablist");
+    const projects = screen.getByTestId("project-list");
 
     await addProjects(["Veresk"]);
     expect(projects.children).toHaveLength(1);
@@ -78,7 +78,7 @@ describe("Projects", () => {
 
   it("should add one project to the list of by clicking Create button", async () => {
     renderProjects();
-    const projects = screen.getByRole("tablist");
+    const projects = screen.getByTestId("project-list");
 
     await userEvent.click(screen.getByText("New project"));
     await userEvent.type(screen.getByLabelText("Project name"), "Project 1");
@@ -89,7 +89,7 @@ describe("Projects", () => {
 
   it("should add two projects to the list of projects", async () => {
     renderProjects();
-    const projects = screen.getByRole("tablist");
+    const projects = screen.getByTestId("project-list");
 
     await addProjects(["Veresk", "Candy"]);
     expect(projects.children).toHaveLength(2);
@@ -100,7 +100,7 @@ describe("Projects", () => {
   it("should select project by clicking", async () => {
     renderProjects();
     await addProjects(["Veresk", "Candy"]);
-    const projects = screen.getByRole("tablist");
+    const projects = screen.getByTestId("project-list");
 
     expect(hasClass(within(projects).getByText("Candy"), "font-bold")).toBe(
       true
@@ -351,7 +351,7 @@ describe("Projects", () => {
       expect(input.value).toBe("");
     });
   });
-  describe("send project", () => {
+  describe("shared project", () => {
     afterEach(() => {
       jest.restoreAllMocks();
     });
@@ -386,17 +386,36 @@ describe("Projects", () => {
       );
       expect(swarm.send).toHaveBeenCalledTimes(1);
     });
+
+    it("should display shared project in the list", async () => {
+      const swarm = new SwarmMock();
+      const topic = "topic";
+      renderProjects({ swarm, createTopic: () => topic });
+
+      const project = { ...createNewProject("Alian"), topic };
+      const tasks = [createNewTask("alian task 1", "1")];
+
+      act(() => {
+        swarm.simulatePeerData(
+          { pubKey: "abcdef" },
+          JSON.stringify({
+            type: "share-project",
+            payload: {
+              project,
+              tasks,
+            },
+          })
+        );
+      });
+      await screen.findByText("Alian");
+    });
   });
 });
 
 function getProjectTab(name: string) {
-  return within(screen.getByRole("tablist")).getByText(name);
-}
-
-function queryProjectTab(name: string) {
-  return within(screen.getByRole("tablist")).queryByText(name);
+  return within(screen.getByTestId("project-list")).getByText(name);
 }
 
 function findProjectTab(name: string) {
-  return within(screen.getByRole("tablist")).findByText(name);
+  return within(screen.getByTestId("project-list")).findByText(name);
 }
