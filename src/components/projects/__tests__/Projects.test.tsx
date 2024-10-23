@@ -14,6 +14,8 @@ import { Persist } from "../../../types/persist-types";
 import { createTopic as originalCreateTopic } from "../../../backend/swarm";
 import { CreateTopic } from "../../../model/useSwarm";
 import { Peer, Swarm } from "../../../types/swarm-types";
+import { Project } from "../../../types/project-types";
+import { Task } from "../../../types/task-types";
 
 function renderProjects({
   persist = new PersistMock(),
@@ -363,7 +365,7 @@ describe("Projects", () => {
 
       jest.spyOn(global.Math, "random").mockReturnValue(0.1);
       await addProjects(["Veresk"]);
-      const project = { ...createNewProject("Veresk"), topic };
+      const project = getProjectMock("Veresk", "1", topic);
 
       jest.spyOn(global.Math, "random").mockReturnValue(0.2);
       await addTasks(["task 1"]);
@@ -389,11 +391,30 @@ describe("Projects", () => {
 
     it("should display shared project in the list", async () => {
       const swarm = new SwarmMock();
-      const topic = "topic";
-      renderProjects({ swarm, createTopic: () => topic });
+      renderProjects({ swarm });
 
-      const project = { ...createNewProject("Alian"), topic };
-      const tasks = [createNewTask("alian task 1", "1")];
+      const project = createNewProject("Alian");
+
+      act(() => {
+        swarm.simulatePeerData(
+          { pubKey: "abcdef" },
+          JSON.stringify({
+            type: "share-project",
+            payload: {
+              project,
+              tasks: [],
+            },
+          })
+        );
+      });
+      await screen.findByText("Alian");
+    });
+    it("should display tasks from shared project list", async () => {
+      const swarm = new SwarmMock();
+      renderProjects({ swarm });
+
+      const project = getProjectMock("Alian", "projid", "topic");
+      const tasks = [getTaskMock("alian task 1", "taskid", "projid")];
 
       act(() => {
         swarm.simulatePeerData(
@@ -407,7 +428,8 @@ describe("Projects", () => {
           })
         );
       });
-      await screen.findByText("Alian");
+
+      await screen.findByText("alian task 1");
     });
   });
 });
@@ -418,4 +440,16 @@ function getProjectTab(name: string) {
 
 function findProjectTab(name: string) {
   return within(screen.getByTestId("project-list")).findByText(name);
+}
+
+function getProjectMock(
+  name: string,
+  id: string,
+  topic: null | string
+): Project {
+  return { name, id, topic };
+}
+
+function getTaskMock(text: string, id: string, projectId: string): Task {
+  return { text, id, projectId, completed: false };
 }

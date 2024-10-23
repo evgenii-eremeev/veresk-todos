@@ -13,8 +13,7 @@ export function Tasks() {
     currentProject,
     setCurrentProjectId,
     removeProject,
-    setProjectTopic,
-    tasks
+    setProjectTopic
   } = useProjects();
   const { joinTopic, createTopic } = useSwarm();
   useSwarmEffect();

@@ -29,6 +29,7 @@ const ProjectsModelContext = createContext<ProjectsModel | null>(null);
 
 export interface ProjectsModel {
   tasks: Array<Task>;
+  sharedTasks: Array<Task>;
   addTask: (projectId: string, text: string) => void;
   editTask: (taskId: string, text: string) => void;
   removeTask: (taskId: string) => void;
@@ -48,9 +49,11 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
 
   const [projects, setProjects] = useState<Array<Project>>([]);
   const [currentProjectId, setCurrentProjectId] = useState<string | null>("");
-  const currentProject =
-    projects.find((propject) => propject.id === currentProjectId) ?? null;
   const [sharedProjects, setSharedProjects] = useState<Array<Project>>([]);
+  const [sharedTasks, setSharedTasks] = useState<Task[]>([]);
+
+  const currentProject =
+  [...projects, ...sharedProjects].find((propject) => propject.id === currentProjectId) ?? null;
 
   const { setProjectsPersist, setTasksPersist } = usePersistance({
     persist,
@@ -127,11 +130,15 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
   }
 
   function addSharedProject(project: Project, tasks: Task[]) {
-    setSharedProjects(projects => [...projects, project])
+    setSharedProjects((projects) => [...projects, project]);
+    setSharedTasks((sharedTasks) => [...sharedTasks, ...tasks]);
   }
 
   return {
     tasks: tasks.filter((task) => task.projectId == currentProject?.id),
+    sharedTasks: sharedTasks.filter(
+      (task) => task.projectId == currentProject?.id
+    ),
     addTask,
     editTask,
     removeTask,

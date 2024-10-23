@@ -6,7 +6,8 @@ import { Task } from "../types/task-types";
 
 export function useSwarmEffect() {
   const { swarm, addMessage, setPeerCount, send, topic } = useSwarm();
-  const { currentProject, tasks, addSharedProject } = useProjects();
+  const { currentProject, tasks, addSharedProject, setCurrentProjectId } =
+    useProjects();
 
   useEffect(() => {
     swarm.onPeerConnected((peer) => {
@@ -41,6 +42,7 @@ export function useSwarmEffect() {
           break;
         case "share-project":
           addSharedProject(payload.project, payload.tasks);
+          setCurrentProjectId(payload.project.id);
           break;
         default:
           console.error("unknown swarm message type");

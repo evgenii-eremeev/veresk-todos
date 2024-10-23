@@ -3,7 +3,19 @@ import { TaskListItem } from "./TaskListItem";
 import { useProjects } from "../../model/useProjects";
 
 export function TaskList() {
-  const { tasks, removeTask, toggleTaskCompleted } = useProjects();
+  const {
+    tasks: ownTasks,
+    sharedTasks,
+    currentProject,
+    sharedProjects,
+    removeTask,
+    toggleTaskCompleted,
+  } = useProjects();
+
+  const isSharedProject = sharedProjects.find(
+    (project) => project.id == currentProject?.id
+  );
+  const tasks = isSharedProject ? sharedTasks : ownTasks;
   return (
     <ul>
       {[
