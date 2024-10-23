@@ -83,6 +83,11 @@ export function getProjectMock(
   return { name, id, topic };
 }
 
-export function getTaskMock(text: string, id: string, projectId: string): Task {
-  return { text, id, projectId, completed: false };
+export function getTaskMock(
+  text: string,
+  id: string,
+  projectId: string,
+  completed: boolean = false
+): Task {
+  return { text, id, projectId, completed };
 }

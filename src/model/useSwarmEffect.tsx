@@ -12,6 +12,7 @@ export function useSwarmEffect() {
     addSharedProject,
     setCurrentProjectId,
     eventsRef,
+    updateTask,
   } = useProjects();
 
   useEffect(() => {
@@ -39,7 +40,8 @@ export function useSwarmEffect() {
         | {
             type: "share-project";
             payload: { project: Project; tasks: Task[] };
-          } = JSON.parse(data);
+          }
+        | { type: "task-update"; payload: Task } = JSON.parse(data);
 
       switch (type) {
         case "chat-message":
@@ -49,13 +51,19 @@ export function useSwarmEffect() {
           addSharedProject(payload.project, payload.tasks);
           setCurrentProjectId(payload.project.id);
           break;
+        case "task-update":
+          updateTask(payload.id, () => ({
+            text: payload.text,
+            completed: payload.completed,
+          }), false);
+          break;
         default:
           console.error("unknown swarm message type", type, payload);
       }
     });
 
-    eventsRef.current.on('task-update', task => {
-      sendAll({type: 'task-update', payload: task})
-    })
+    eventsRef.current.on("task-update", (task) => {
+      sendAll({ type: "task-update", payload: task });
+    });
   }, []);
 }

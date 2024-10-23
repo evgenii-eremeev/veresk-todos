@@ -185,6 +185,10 @@ describe("Tasks", () => {
   });
 
   describe("editing shared task", () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
     it("should send edit event to the host", async () => {
       const swarm = new SwarmMock();
       await renderTasksAndSetup({ swarm });
@@ -201,6 +205,47 @@ describe("Tasks", () => {
           payload: getTaskMock("alian task 1 updated", "taskid", "projid"),
         })
       );
+    });
+    it("should receive edit event and update the task text", async () => {
+      const swarm = new SwarmMock();
+      await renderTasksAndSetup({ swarm });
+
+      jest.spyOn(global.Math, "random").mockReturnValue(0.2);
+      await addTasks(["task before"]);
+
+      act(() => {
+        swarm.simulatePeerData(
+          { pubKey: "abcdef" },
+          JSON.stringify({
+            type: "task-update",
+            payload: getTaskMock("task after", "2", "projid"),
+          })
+        );
+      });
+
+      expect(screen.queryByText("task before")).toBeNull();
+      screen.getByText("task after");
+    });
+    it("should receive edit event and update the task completion state", async () => {
+      const swarm = new SwarmMock();
+      await renderTasksAndSetup({ swarm });
+
+      jest.spyOn(global.Math, "random").mockReturnValue(0.2);
+      await addTasks(["task 1"]);
+
+      act(() => {
+        swarm.simulatePeerData(
+          { pubKey: "abcdef" },
+          JSON.stringify({
+            type: "task-update",
+            payload: getTaskMock("task 1", "2", "projid", true),
+          })
+        );
+      });
+
+      expect(
+        screen.getByText("task 1").classList.contains("line-through")
+      ).toBe(true);
     });
   });
 });

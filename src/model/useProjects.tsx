@@ -30,6 +30,8 @@ export function ProjectsModelProvider({
 
 const ProjectsModelContext = createContext<ProjectsModel | null>(null);
 
+type TaskUpdater = (task: Task) => Partial<Omit<Task, "id" | "projectId">>;
+
 export interface ProjectsModel {
   tasks: Array<Task>;
   addTask: (projectId: string, text: string) => void;
@@ -46,6 +48,7 @@ export interface ProjectsModel {
   setProjectTopic: (projectId: string, topic: string) => void;
   addSharedProject: (project: Project, task: Task[]) => void;
   eventsRef: MutableRefObject<EventEmitter>;
+  updateTask: (taskId: string, updater: TaskUpdater, emit?: boolean) => void;
 }
 
 function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
@@ -94,15 +97,18 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
 
   function updateTask(
     taskId: string,
-    updater: (task: Task) => Partial<Omit<Task, "id" | "projectId">>
+    updater: TaskUpdater,
+    emit: boolean = true
   ) {
     setTasksPersist((tasks) =>
       tasks.map((task) => {
         if (task.id == taskId) {
-          return {
+          const updatedTask = {
             ...task,
             ...updater(task),
           };
+          emit && eventsRef.current.emit("task-update", updatedTask);
+          return updatedTask;
         } else {
           return task;
         }
@@ -115,7 +121,7 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
             ...task,
             ...updater(task),
           };
-          eventsRef.current.emit("task-update", updatedTask);
+          emit && eventsRef.current.emit("task-update", updatedTask);
           return updatedTask;
         } else {
           return task;
@@ -178,6 +184,7 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
     removeProject,
     setProjectTopic,
     eventsRef,
+    updateTask,
   };
 }
 
