@@ -1,24 +1,46 @@
-import { render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import {
   addProjects,
   addTasks,
+  getProjectMock,
+  getTaskMock,
   PersistMock,
   SwarmMock,
 } from "../../../utils/testing";
 import { Projects } from "../../projects/Projects";
 import { createTopic } from "../../../backend/swarm";
+import { Project } from "../../../types/project-types";
+import { Swarm } from "../../../types/swarm-types";
+import { Task } from "../../../types/task-types";
 
-async function renderTasksAndSetup() {
+async function renderTasksAndSetup({
+  swarm = new SwarmMock(),
+}: { swarm?: Swarm } = {}) {
   render(
     <Projects
       persist={new PersistMock()}
-      swarm={new SwarmMock()}
+      swarm={swarm}
       createTopic={createTopic}
     />
   );
   await addProjects(["Test project"]);
+}
+
+function addSharedProject(swarm: SwarmMock, project: Project, tasks: Task[]) {
+  act(() => {
+    swarm.simulatePeerData(
+      { pubKey: "abcdef" },
+      JSON.stringify({
+        type: "share-project",
+        payload: {
+          project,
+          tasks,
+        },
+      })
+    );
+  });
 }
 
 describe("Tasks", () => {
@@ -159,6 +181,26 @@ describe("Tasks", () => {
       await userEvent.keyboard(" updated{Enter}");
 
       expect(screen.getByText("task 1 updated")).not.toBeNull();
+    });
+  });
+
+  describe("editing shared task", () => {
+    it("should send edit event to the host", async () => {
+      const swarm = new SwarmMock();
+      await renderTasksAndSetup({ swarm });
+
+      const project = getProjectMock("Alian", "projid", "topic");
+      const tasks = [getTaskMock("alian task 1", "taskid", "projid")];
+      addSharedProject(swarm, project, tasks);
+
+      await userEvent.click(screen.getByText("Edit"));
+      await userEvent.keyboard(" updated{Enter}");
+      expect(swarm.sendAll).toHaveBeenCalledWith(
+        JSON.stringify({
+          type: "task-update",
+          payload: getTaskMock("alian task 1 updated", "taskid", "projid"),
+        })
+      );
     });
   });
 });

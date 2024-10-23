@@ -7,12 +7,10 @@ interface Props {
   onDone?: () => void;
   task?: Task;
 }
-export function TaskCreator({
-  onDone = () => {},
-  task,
-}: Props = {}) {
+export function TaskCreator({ onDone = () => {}, task }: Props = {}) {
   const [draft, setDraft] = useState(task ? task.text : "");
-  const { addTask, editTask, currentProject } = useProjects();
+  const { addTask, editTask, currentProject, isSharedProjectActive } =
+    useProjects();
   const editMode = task != null;
 
   return (
@@ -22,7 +20,7 @@ export function TaskCreator({
         event.preventDefault();
         if (!draft || !currentProject) return;
         if (editMode) {
-          editTask(task.id, draft)
+          editTask(task.id, draft);
         } else {
           addTask(currentProject.id, draft);
         }
@@ -40,9 +38,9 @@ export function TaskCreator({
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
       />
-        <Button type="submit" className="mx-2">
-          {editMode ? "Done" : "Add"}
-        </Button>
-      </form>
+      <Button type="submit" className="mx-2">
+        {editMode ? "Done" : "Add"}
+      </Button>
+    </form>
   );
 }

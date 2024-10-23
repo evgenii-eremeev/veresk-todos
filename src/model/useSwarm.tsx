@@ -2,7 +2,6 @@ import React, {
   createContext,
   PropsWithChildren,
   useContext,
-  useEffect,
   useState,
 } from "react";
 import { Swarm as SwarmI } from "../types/swarm-types";
@@ -27,6 +26,10 @@ export function SwarmModelProvider({
 }
 
 export type CreateTopic = () => string;
+export type SwarmMessage = {
+  type: string,
+  payload: Object
+}
 export interface SwarmModel {
   createTopic: CreateTopic;
   topic: string | null;
@@ -35,8 +38,8 @@ export interface SwarmModel {
   messages: Array<Message>;
   joinTopic: (topic: string) => Promise<void>;
   isJoining: boolean;
-  sendAll: (data: Object) => void;
-  send: (to: string, data: Object) => void;
+  sendAll: (data: SwarmMessage) => void;
+  send: (to: string, data: SwarmMessage) => void;
   addMessage: (text: string, from: string) => void;
   setPeerCount: (count: number) => void;
   swarm: SwarmI;
@@ -66,11 +69,11 @@ function useSwarmModel({
     setTopic(topic);
   }
 
-  function sendAll(data: Object) {
+  function sendAll(data: SwarmMessage) {
     swarm.sendAll(JSON.stringify(data));
   }
 
-  function send(to: string, data: Object) {
+  function send(to: string, data: SwarmMessage) {
     swarm.send(to, JSON.stringify(data))
   }
 

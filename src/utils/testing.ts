@@ -2,6 +2,8 @@ import userEvent from "@testing-library/user-event";
 import { screen } from "@testing-library/react";
 import { Persist } from "./persist";
 import { Peer, Swarm } from "../types/swarm-types";
+import { Project } from "../types/project-types";
+import { Task } from "../types/task-types";
 
 export function hasClass(elem: HTMLElement, className: string) {
   return elem.classList.contains(className);
@@ -71,4 +73,16 @@ export class SwarmMock implements Swarm {
   simulatePeerData(peer: Peer, data: string) {
     this.eventCallbacks.peerData(peer, data);
   }
+}
+
+export function getProjectMock(
+  name: string,
+  id: string,
+  topic: null | string
+): Project {
+  return { name, id, topic };
+}
+
+export function getTaskMock(text: string, id: string, projectId: string): Task {
+  return { text, id, projectId, completed: false };
 }

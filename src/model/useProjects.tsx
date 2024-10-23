@@ -1,14 +1,17 @@
 import React, {
   createContext,
+  MutableRefObject,
   PropsWithChildren,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { Task } from "../types/task-types";
 import { Project } from "../types/project-types";
 import { randomStringOfNumbers } from "../utils/random";
 import { Persist } from "../types/persist-types";
+import { EventEmitter } from "events";
 
 export function useProjects(): ProjectsModel {
   const model = useContext(ProjectsModelContext);
@@ -29,7 +32,6 @@ const ProjectsModelContext = createContext<ProjectsModel | null>(null);
 
 export interface ProjectsModel {
   tasks: Array<Task>;
-  sharedTasks: Array<Task>;
   addTask: (projectId: string, text: string) => void;
   editTask: (taskId: string, text: string) => void;
   removeTask: (taskId: string) => void;
@@ -37,15 +39,17 @@ export interface ProjectsModel {
   projects: Array<Project>;
   sharedProjects: Array<Project>;
   currentProject: Project | null;
+  isSharedProjectActive: boolean;
   addNewProject: (name: string) => void;
   setCurrentProjectId: (projectId: string | null) => void;
   removeProject: (projectId: string) => void;
   setProjectTopic: (projectId: string, topic: string) => void;
   addSharedProject: (project: Project, task: Task[]) => void;
+  eventsRef: MutableRefObject<EventEmitter>;
 }
 
 function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
-  const [tasks, setTasks] = useState<Array<Task>>([]);
+  const [ownTasks, setOwnTasks] = useState<Array<Task>>([]);
 
   const [projects, setProjects] = useState<Array<Project>>([]);
   const [currentProjectId, setCurrentProjectId] = useState<string | null>("");
@@ -53,12 +57,20 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
   const [sharedTasks, setSharedTasks] = useState<Task[]>([]);
 
   const currentProject =
-  [...projects, ...sharedProjects].find((propject) => propject.id === currentProjectId) ?? null;
+    [...projects, ...sharedProjects].find(
+      (propject) => propject.id === currentProjectId
+    ) ?? null;
+
+  const isSharedProjectActive =
+    sharedProjects.filter((project) => project.id == currentProject?.id)
+      .length === 1;
+
+  const eventsRef = useRef(new EventEmitter());
 
   const { setProjectsPersist, setTasksPersist } = usePersistance({
     persist,
     setProjects,
-    setTasks,
+    setTasks: setOwnTasks,
     onStateLoaded({ projects }) {
       setCurrentProjectId(projects[0]?.id ?? null);
     },
@@ -91,6 +103,20 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
             ...task,
             ...updater(task),
           };
+        } else {
+          return task;
+        }
+      })
+    );
+    setSharedTasks((sharedTasks) =>
+      sharedTasks.map((task) => {
+        if (task.id == taskId) {
+          const updatedTask = {
+            ...task,
+            ...updater(task),
+          };
+          eventsRef.current.emit("task-update", updatedTask);
+          return updatedTask;
         } else {
           return task;
         }
@@ -134,11 +160,10 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
     setSharedTasks((sharedTasks) => [...sharedTasks, ...tasks]);
   }
 
+  const tasks = isSharedProjectActive ? sharedTasks : ownTasks;
+
   return {
     tasks: tasks.filter((task) => task.projectId == currentProject?.id),
-    sharedTasks: sharedTasks.filter(
-      (task) => task.projectId == currentProject?.id
-    ),
     addTask,
     editTask,
     removeTask,
@@ -146,11 +171,13 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
     projects,
     sharedProjects,
     currentProject,
+    isSharedProjectActive,
     addNewProject,
     addSharedProject,
     setCurrentProjectId,
     removeProject,
     setProjectTopic,
+    eventsRef,
   };
 }
 

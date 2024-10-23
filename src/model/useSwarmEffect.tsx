@@ -5,9 +5,14 @@ import { Project } from "../types/project-types";
 import { Task } from "../types/task-types";
 
 export function useSwarmEffect() {
-  const { swarm, addMessage, setPeerCount, send, topic } = useSwarm();
-  const { currentProject, tasks, addSharedProject, setCurrentProjectId } =
-    useProjects();
+  const { swarm, addMessage, setPeerCount, send, sendAll, topic } = useSwarm();
+  const {
+    currentProject,
+    tasks,
+    addSharedProject,
+    setCurrentProjectId,
+    eventsRef,
+  } = useProjects();
 
   useEffect(() => {
     swarm.onPeerConnected((peer) => {
@@ -45,8 +50,12 @@ export function useSwarmEffect() {
           setCurrentProjectId(payload.project.id);
           break;
         default:
-          console.error("unknown swarm message type");
+          console.error("unknown swarm message type", type, payload);
       }
     });
+
+    eventsRef.current.on('task-update', task => {
+      sendAll({type: 'task-update', payload: task})
+    })
   }, []);
 }
