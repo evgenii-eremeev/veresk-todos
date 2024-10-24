@@ -36,7 +36,7 @@ export interface ProjectsModel {
   tasks: Array<Task>;
   addTask: (projectId: string, text: string) => void;
   editTask: (taskId: string, text: string) => void;
-  removeTask: (taskId: string) => void;
+  removeTask: (taskId: string, emit?: boolean) => void;
   toggleTaskCompleted: (taskId: string) => void;
   projects: Array<Project>;
   sharedProjects: Array<Project>;
@@ -87,8 +87,10 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
     updateTask(taskId, () => ({ text }));
   }
 
-  function removeTask(taskId: string) {
+  function removeTask(taskId: string, emit: boolean = true) {
     setTasksPersist((tasks) => tasks.filter((task) => task.id != taskId));
+    setSharedTasks((tasks) => tasks.filter((task) => task.id != taskId));
+    emit && eventsRef.current.emit("task-delete", taskId);
   }
 
   function toggleTaskCompleted(taskId: string) {

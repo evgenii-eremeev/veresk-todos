@@ -247,5 +247,43 @@ describe("Tasks", () => {
         screen.getByText("task 1").classList.contains("line-through")
       ).toBe(true);
     });
+
+    it("should send remove event", async () => {
+      const swarm = new SwarmMock();
+      await renderTasksAndSetup({ swarm });
+
+      const project = getProjectMock("Alian", "projid", "topic");
+      const tasks = [getTaskMock("alian task 1", "taskid", "projid")];
+      addSharedProject(swarm, project, tasks);
+
+      await userEvent.click(screen.getByText("Delete"));
+
+      expect(swarm.sendAll).toHaveBeenCalledWith(
+        JSON.stringify({
+          type: "task-delete",
+          payload: "taskid",
+        })
+      );
+    });
+
+    it("should receive edit event and update the task text", async () => {
+      const swarm = new SwarmMock();
+      await renderTasksAndSetup({ swarm });
+
+      jest.spyOn(global.Math, "random").mockReturnValue(0.2);
+      await addTasks(["task 1"]);
+
+      act(() => {
+        swarm.simulatePeerData(
+          { pubKey: "abcdef" },
+          JSON.stringify({
+            type: "task-delete",
+            payload: "2",
+          })
+        );
+      });
+
+      expect(screen.queryByText("task 1")).toBeNull();
+    });
   });
 });
