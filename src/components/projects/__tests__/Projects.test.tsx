@@ -13,7 +13,7 @@ import { createNewProject, createNewTask } from "../../../model/useProjects";
 import { Persist } from "../../../types/persist-types";
 import { createTopic as originalCreateTopic } from "../../../backend/swarm";
 import { CreateTopic } from "../../../model/useSwarm";
-import { Peer, Swarm } from "../../../types/swarm-types";
+import { Swarm } from "../../../types/swarm-types";
 import { Project } from "../../../types/project-types";
 import { Task } from "../../../types/task-types";
 

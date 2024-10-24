@@ -22,7 +22,7 @@ export function TaskCreator({ onDone = () => {}, task }: Props = {}) {
         if (editMode) {
           editTask(task.id, draft);
         } else {
-          addTask(currentProject.id, draft);
+          addTask({ text: draft, projectId: currentProject.id });
         }
         setDraft("");
         onDone();

@@ -14,6 +14,7 @@ export function useSwarmEffect() {
     eventsRef,
     updateTask,
     removeTask,
+    addTask,
   } = useProjects();
 
   useEffect(() => {
@@ -43,7 +44,8 @@ export function useSwarmEffect() {
             payload: { project: Project; tasks: Task[] };
           }
         | { type: "task-update"; payload: Task }
-        | { type: "task-delete"; payload: string } = JSON.parse(data);
+        | { type: "task-delete"; payload: string }
+        | { type: "task-add"; payload: Task } = JSON.parse(data);
 
       switch (type) {
         case "chat-message":
@@ -66,6 +68,10 @@ export function useSwarmEffect() {
         case "task-delete":
           removeTask(payload, false);
           break;
+        case "task-add":
+          console.log('receive task add', payload)
+          addTask(payload, false);
+          break;
         default:
           console.error("unknown swarm message type", type, payload);
       }
@@ -77,6 +83,11 @@ export function useSwarmEffect() {
 
     eventsRef.current.on("task-delete", (taskId) => {
       sendAll({ type: "task-delete", payload: taskId });
+    });
+
+    eventsRef.current.on("task-add", (task) => {
+      console.log("sending all on task-add", task);
+      sendAll({ type: "task-add", payload: task });
     });
   }, []);
 }

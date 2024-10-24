@@ -285,5 +285,46 @@ describe("Tasks", () => {
 
       expect(screen.queryByText("task 1")).toBeNull();
     });
+
+    it("should send add task event", async () => {
+      const swarm = new SwarmMock();
+      await renderTasksAndSetup({ swarm });
+
+      const project = getProjectMock("Alian", "projid", "topic");
+      const tasks = [getTaskMock("alian task 1", "taskid", "projid")];
+      addSharedProject(swarm, project, tasks);
+
+      jest.spyOn(global.Math, "random").mockReturnValue(0.2);
+      await addTasks(['alian task 2']);
+
+      expect(swarm.sendAll).toHaveBeenCalledWith(
+        JSON.stringify({
+          type: "task-add",
+          payload: getTaskMock("alian task 2", "2", "projid"),
+        })
+      );
+    });
+
+    it("should receive add event and update the task list", async () => {
+      const swarm = new SwarmMock();
+      jest.spyOn(global.Math, "random").mockReturnValue(0.999);
+      await renderTasksAndSetup({ swarm });
+
+      jest.spyOn(global.Math, "random").mockReturnValue(0.1);
+      await addTasks(["task 1"]);
+
+      act(() => {
+        swarm.simulatePeerData(
+          { pubKey: "abcdef" },
+          JSON.stringify({
+            type: "task-add",
+            payload: getTaskMock("alian task 2", "2", "999"),
+          })
+        );
+      });
+
+      await screen.findByText("alian task 2");
+    });
+
   });
 });

@@ -34,7 +34,10 @@ type TaskUpdater = (task: Task) => Partial<Omit<Task, "id" | "projectId">>;
 
 export interface ProjectsModel {
   tasks: Array<Task>;
-  addTask: (projectId: string, text: string) => void;
+  addTask: (
+    partialTask: { text: string; projectId: string; id?: string },
+    emit?: boolean
+  ) => void;
   editTask: (taskId: string, text: string) => void;
   removeTask: (taskId: string, emit?: boolean) => void;
   toggleTaskCompleted: (taskId: string) => void;
@@ -64,9 +67,7 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
       (propject) => propject.id === currentProjectId
     ) ?? null;
 
-  const isSharedProjectActive =
-    sharedProjects.filter((project) => project.id == currentProject?.id)
-      .length === 1;
+  const isSharedProjectActive = isSharedProject(currentProjectId);
 
   const eventsRef = useRef(new EventEmitter());
 
@@ -79,8 +80,23 @@ function useProjectsModel({ persist }: { persist: Persist }): ProjectsModel {
     },
   });
 
-  function addTask(projectId: string, text: string) {
-    setTasksPersist((tasks) => [...tasks, createNewTask(text, projectId)]);
+  function isSharedProject(projectId: string | null) {
+    return (
+      sharedProjects.filter((project) => project.id == projectId).length === 1
+    );
+  }
+
+  function addTask(
+    { text, projectId, id }: { text: string; projectId: string; id?: string },
+    emit = true
+  ) {
+    const task = createNewTask(text, projectId, id);
+    if (isSharedProject(projectId)) {
+      setSharedTasks((tasks) => [...tasks, task]);
+    } else {
+      setTasksPersist((tasks) => [...tasks, task]);
+    }
+    emit && eventsRef.current.emit("task-add", task);
   }
 
   function editTask(taskId: string, text: string) {
@@ -238,8 +254,12 @@ function usePersistance({
   };
 }
 
-export function createNewTask(text: string, projectId: string): Task {
-  return { text, completed: false, id: randomStringOfNumbers(), projectId };
+export function createNewTask(
+  text: string,
+  projectId: string,
+  id = randomStringOfNumbers()
+): Task {
+  return { text, id, projectId, completed: false };
 }
 
 export function createNewProject(name: string): Project {
